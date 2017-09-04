@@ -13,7 +13,7 @@ class Tenma72_2540:
     """
         Control a tenma 72-2540 DC power supply
     """
-    def __init__(self, serialPort):
+    def __init__(self, serialPort, debug=False):
         self.ser = serial.Serial(port=serialPort,
             baudrate=9600,
             parity=serial.PARITY_NONE,
@@ -23,8 +23,11 @@ class Tenma72_2540:
         self.NCONFS = 4
         self.MAX_MA = 5000
         self.MAX_MV = 30000
+        self.DEBUG = debug
 
     def __sendCommand(self, command):
+        if self.DEBUG:
+            print ">> ", command
         self.ser.write(command)
         time.sleep(0.5) #give it time to process
 
@@ -32,6 +35,10 @@ class Tenma72_2540:
         out=""
         while self.ser.inWaiting() > 0:
             out += self.ser.read(1)
+
+        if self.DEBUG:
+            print "<< ", out
+
         return out
 
     def getVersion(self):

@@ -14,12 +14,13 @@ parser.add_argument('-s','--save', help='Save current configuration to Memory', 
 parser.add_argument('-r','--recall', help='Load configuration from Memory', required=False, type=int)
 parser.add_argument('--on', help='Set output to ON', action="store_true", default=False)
 parser.add_argument('--off', help='Set output to OFF', action="store_true", default=False)
-parser.add_argument('--verbose', help='Chatty output', action="store_true", default=False)
+parser.add_argument('--verbose', help='Chatty program', action="store_true", default=False)
+parser.add_argument('--debug', help='print serial commands', action="store_true", default=False)
 args = vars(parser.parse_args())
 
 try:
     VERB = args["verbose"]
-    T = Tenma72_2540(args["device"])
+    T = Tenma72_2540(args["device"], debug=args["debug"])
     print "VERSION: ",T.getVersion()
 
     if args["voltage"]:
@@ -37,20 +38,24 @@ try:
             print "Saving to Memory", args["save"]
 
         T.saveConf( args["save"])
+        volt = T.readVoltage(1)
+        curr = T.readCurrent(1)
 
         print "Saved to Memory", args["save"]
-        print "Voltage:", T.readVoltage(1)
-        print "Current:", T.readCurrent(1)
+        print "Voltage:", volt
+        print "Current:", curr
 
     if args["recall"]:
         if VERB:
             print "Loading from Memory: ", args["recall"]
 
         T.recallConf(args["recall"])
+        volt = T.readVoltage(1)
+        curr = T.readCurrent(1)
 
         print "Loaded from Memory: ", args["recall"]
-        print "Voltage:", T.readVoltage(1)
-        print "Current:", T.readCurrent(1)
+        print "Voltage:", volt
+        print "Current:", curr
 
 
     if args["on"]:
