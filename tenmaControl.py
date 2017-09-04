@@ -1,6 +1,6 @@
 """
     @author Jordi Castells
-    Command line tenma control program
+    Command line tenma control program for Tenma72_2540
 """
 
 import argparse
