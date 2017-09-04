@@ -22,7 +22,7 @@ class Tenma:
 
     def __sendCommand(self, command):
         self.ser.write(command)
-        time.sleep(1) #give it time to process
+        time.sleep(0.5) #give it time to process
 
     def __readOutput(self):
         out=""
@@ -66,22 +66,6 @@ class Tenma:
                 read=readcurrent * 1000,
                 ))
 
-    def saveConf(self, conf):
-        if conf > self.NCONFS:
-            raise TenmaException("Trying to set M{channel} with only {nch} confs".format(
-                channel=conf,
-                nch=self.NCONFS
-                ))
-        pass
-
-    def recallConf(self, conf):
-        if conf > self.NCONFS:
-            raise TenmaException("Trying to recall M{channel} with only {nch} confs".format(
-                channel=conf,
-                nch=self.NCONFS
-                ))
-
-        pass
 
     def setVoltage(self, channel, mV):
         if channel > self.NCHANNELS:
@@ -115,6 +99,62 @@ class Tenma:
                 read=readvolt * 1000,
                 ))
 
+    def runningCurrent(self, channel):
+        """
+            This does not seem to work
+        """
+        if channel > self.NCHANNELS:
+            raise TenmaException("Trying to read CH{channel} with only {nch} channels".format(
+                channel=channel,
+                nch=self.NCHANNELS
+                ))
+
+        command = "IOUT{channel}".format(channel=channel)
+        self.__sendCommand(command)
+        readcurrent = self.__readOutput()
+        return readcurrent
+
+    def runningVoltage(self, channel):
+        """
+            This does not seem to work
+        """
+        if channel > self.NCHANNELS:
+            raise TenmaException("Trying to read CH{channel} with only {nch} channels".format(
+                channel=channel,
+                nch=self.NCHANNELS
+                ))
+
+        command = "VOUT{channel}".format(channel=channel)
+        self.__sendCommand(command)
+        readvolt = self.__readOutput()
+        return readvolt
+
+    def saveConf(self, conf):
+        """
+            Save current configuration
+        """
+        if conf > self.NCONFS:
+            raise TenmaException("Trying to set M{channel} with only {nch} confs".format(
+                channel=conf,
+                nch=self.NCONFS
+                ))
+
+        command = "SAV{conf}".format(conf=conf)
+        self.__sendCommand(command)
+
+    def recallConf(self, conf):
+        """
+            Load existing configuration
+        """
+
+        if conf > self.NCONFS:
+            raise TenmaException("Trying to recall M{channel} with only {nch} confs".format(
+                channel=conf,
+                nch=self.NCONFS
+                ))
+
+        command = "RCL{conf}".format(conf=conf)
+        self.__sendCommand(command)
 
     def ON(self):
         """
@@ -137,8 +177,15 @@ class Tenma:
         self.ser.close()
 
 T = Tenma('/dev/ttyUSB0')
-#T.printVersion()
-T.setCurrent(1, 2200)
-T.setVoltage(1, 6000)
+print T.getVersion()
+#T.setCurrent(1, 2200)
+#T.setVoltage(1, 6000)
+
 T.ON()
+
+print T.runningVoltage(1)
+print T.runningCurrent(1)
+
+T.OFF()
+
 T.close()
