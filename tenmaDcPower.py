@@ -14,8 +14,9 @@ class Tenma:
             parity=serial.PARITY_NONE,
             stopbits=serial.STOPBITS_ONE)
 
-        self.NCHANNELS = 4
+        self.NCHANNELS = 1
         self.MAX_MA = 5100
+        self.MAX_MV = 31000
 
 
     def __sendCommand(self, command):
@@ -60,10 +61,41 @@ class Tenma:
 
         if readcurrent * 1000 != mA:
             raise TenmaException("Set {set}mA, but read {read}mA".format(
-                set=,mA
+                set=mA,
                 read=readcurrent * 1000,
                 ))
 
+    def setVoltage(self, channel, mV):
+        if channel > self.NCHANNELS:
+            raise TenmaException("Trying to set CH{channel} with only {nch} channels".format(
+                channel=channel,
+                nch=self.NCHANNELS
+                ))
+
+        if mV > self.MAX_MV:
+            raise TenmaException("Trying to set CH{channel} to {mv}mV, the maximum is {max}mV".format(
+                channel=channel,
+                mv=mV,
+                max=self.MAX_MV
+                ))
+
+        command = "VSET{channel}:{volt:.2f}"
+
+        V = float(mV) / 1000.0
+        command = command.format(channel=1, volt=V)
+
+        commandCheck = "VSET{channel}?".format(channel=1)
+
+        self.__sendCommand(command)
+
+        self.__sendCommand(commandCheck)
+        readvolt = float(self.__readOutput())
+
+        if readvolt * 1000 != mV:
+            raise TenmaException("Set {set}mV, but read {read}mV".format(
+                set=mV,
+                read=readvolt * 1000,
+                ))
 
     def close(self):
         self.ser.close()
@@ -71,4 +103,5 @@ class Tenma:
 T = Tenma('/dev/ttyUSB0')
 #T.printVersion()
 T.setCurrent(1, 2200)
+T.setVoltage(1, 5000)
 T.close()
