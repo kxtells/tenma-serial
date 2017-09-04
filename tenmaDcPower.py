@@ -15,6 +15,7 @@ class Tenma:
             stopbits=serial.STOPBITS_ONE)
 
         self.NCHANNELS = 1
+        self.NCONFS = 4
         self.MAX_MA = 5100
         self.MAX_MV = 31000
 
@@ -29,9 +30,9 @@ class Tenma:
             out += self.ser.read(1)
         return out
 
-    def printVersion(self):
+    def getVersion(self):
         self.__sendCommand("*IDN?")
-        print self.__readOutput()
+        return self.__readOutput()
 
     def setCurrent(self, channel, mA):
         if channel > self.NCHANNELS:
@@ -65,6 +66,23 @@ class Tenma:
                 read=readcurrent * 1000,
                 ))
 
+    def saveConf(self, conf):
+        if conf > self.NCONFS:
+            raise TenmaException("Trying to set M{channel} with only {nch} confs".format(
+                channel=conf,
+                nch=self.NCONFS
+                ))
+        pass
+
+    def recallConf(self, conf):
+        if conf > self.NCONFS:
+            raise TenmaException("Trying to recall M{channel} with only {nch} confs".format(
+                channel=conf,
+                nch=self.NCONFS
+                ))
+
+        pass
+
     def setVoltage(self, channel, mV):
         if channel > self.NCHANNELS:
             raise TenmaException("Trying to set CH{channel} with only {nch} channels".format(
@@ -97,11 +115,30 @@ class Tenma:
                 read=readvolt * 1000,
                 ))
 
+
+    def ON(self):
+        """
+            Turns on the output
+        """
+
+        command = "OUT1"
+        self.__sendCommand(command)
+
+    def OFF(self):
+        """
+            Turns OFF the output
+        """
+
+        command = "OUT0"
+        self.__sendCommand(command)
+
+
     def close(self):
         self.ser.close()
 
 T = Tenma('/dev/ttyUSB0')
 #T.printVersion()
 T.setCurrent(1, 2200)
-T.setVoltage(1, 5000)
+T.setVoltage(1, 6000)
+T.ON()
 T.close()
