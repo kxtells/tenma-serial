@@ -1,7 +1,10 @@
 import serial
 import time
 
-class tenma:
+class TenmaException(Exception):
+    pass
+
+class Tenma:
     """
         Control a tenma 72-2540 DC power supply
     """
@@ -30,14 +33,18 @@ class tenma:
         print self.__readOutput()
 
     def setCurrent(self, channel, mA):
-        """
-            Returns True if current was set correctly, False otherwise
-        """
         if channel > self.NCHANNELS:
-            return False
+            raise TenmaException("Trying to set CH{channel} with only {nch} channels".format(
+                channel=channel,
+                nch=self.NCHANNELS
+                ))
 
         if mA > self.MAX_MA:
-            return False
+            raise TenmaException("Trying to set CH{channel} to {ma}mA, the maximum is {max}mA".format(
+                channel=channel,
+                ma=mA,
+                max=self.MAX_MA
+                ))
 
         command = "ISET{channel}:{amperes:.3f}"
 
@@ -52,17 +59,16 @@ class tenma:
         readcurrent = float(self.__readOutput())
 
         if readcurrent * 1000 != mA:
-            print "Incorrect current read"
-            return False
-
-        return True
-
+            raise TenmaException("Set {set}mA, but read {read}mA".format(
+                set=,mA
+                read=readcurrent * 1000,
+                ))
 
 
     def close(self):
         self.ser.close()
 
-T = tenma('/dev/ttyUSB0')
+T = Tenma('/dev/ttyUSB0')
 #T.printVersion()
-T.setCurrent(1, 3500)
+T.setCurrent(1, 2200)
 T.close()
