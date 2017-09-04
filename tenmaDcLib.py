@@ -1,10 +1,15 @@
+"""
+    @author Jordi Castells
+    Small python library to control a Tenma 72-2540 programmable DC power
+    supply
+"""
 import serial
 import time
 
 class TenmaException(Exception):
     pass
 
-class Tenma:
+class Tenma72_2540:
     """
         Control a tenma 72-2540 DC power supply
     """
@@ -16,9 +21,8 @@ class Tenma:
 
         self.NCHANNELS = 1
         self.NCONFS = 4
-        self.MAX_MA = 5100
-        self.MAX_MV = 31000
-
+        self.MAX_MA = 5000
+        self.MAX_MV = 30000
 
     def __sendCommand(self, command):
         self.ser.write(command)
@@ -176,7 +180,7 @@ class Tenma:
     def close(self):
         self.ser.close()
 
-T = Tenma('/dev/ttyUSB0')
+T = Tenma72_2540('/dev/ttyUSB0')
 print T.getVersion()
 #T.setCurrent(1, 2200)
 #T.setVoltage(1, 6000)
