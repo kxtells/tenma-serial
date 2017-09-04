@@ -38,6 +38,18 @@ class Tenma72_2540:
         self.__sendCommand("*IDN?")
         return self.__readOutput()
 
+
+    def readCurrent(self, channel):
+        if channel > self.NCHANNELS:
+            raise TenmaException("Trying to read CH{channel} with only {nch} channels".format(
+                channel=channel,
+                nch=self.NCHANNELS
+                ))
+
+        commandCheck = "ISET{channel}?".format(channel=1)
+        self.__sendCommand(commandCheck)
+        return float(self.__readOutput())
+
     def setCurrent(self, channel, mA):
         if channel > self.NCHANNELS:
             raise TenmaException("Trying to set CH{channel} with only {nch} channels".format(
@@ -57,12 +69,10 @@ class Tenma72_2540:
         A = float(mA) / 1000.0
         command = command.format(channel=1, amperes=A)
 
-        commandCheck = "ISET{channel}?".format(channel=1)
 
         self.__sendCommand(command)
+        readCurrent = self.readCurrent(channel)
 
-        self.__sendCommand(commandCheck)
-        readcurrent = float(self.__readOutput())
 
         if readcurrent * 1000 != mA:
             raise TenmaException("Set {set}mA, but read {read}mA".format(
@@ -70,6 +80,17 @@ class Tenma72_2540:
                 read=readcurrent * 1000,
                 ))
 
+
+    def readVoltage(self, channel):
+        if channel > self.NCHANNELS:
+            raise TenmaException("Trying to read CH{channel} with only {nch} channels".format(
+                channel=channel,
+                nch=self.NCHANNELS
+                ))
+
+        commandCheck = "VSET{channel}?".format(channel=1)
+        self.__sendCommand(commandCheck)
+        return float(self.__readOutput())
 
     def setVoltage(self, channel, mV):
         if channel > self.NCHANNELS:
@@ -180,16 +201,16 @@ class Tenma72_2540:
     def close(self):
         self.ser.close()
 
-T = Tenma72_2540('/dev/ttyUSB0')
-print T.getVersion()
-#T.setCurrent(1, 2200)
-#T.setVoltage(1, 6000)
-
-T.ON()
-
-print T.runningVoltage(1)
-print T.runningCurrent(1)
-
-T.OFF()
-
-T.close()
+#T = Tenma72_2540('/dev/ttyUSB0')
+#print T.getVersion()
+##T.setCurrent(1, 2200)
+##T.setVoltage(1, 6000)
+#
+#T.ON()
+#
+#print T.runningVoltage(1)
+#print T.runningCurrent(1)
+#
+#T.OFF()
+#
+#T.close()
