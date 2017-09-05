@@ -78,15 +78,13 @@ class Tenma72_2540:
 
 
         self.__sendCommand(command)
-        readCurrent = self.readCurrent(channel)
-
+        readcurrent = self.readCurrent(channel)
 
         if readcurrent * 1000 != mA:
             raise TenmaException("Set {set}mA, but read {read}mA".format(
                 set=mA,
                 read=readcurrent * 1000,
                 ))
-
 
     def readVoltage(self, channel):
         if channel > self.NCHANNELS:
@@ -118,12 +116,8 @@ class Tenma72_2540:
         V = float(mV) / 1000.0
         command = command.format(channel=1, volt=V)
 
-        commandCheck = "VSET{channel}?".format(channel=1)
-
         self.__sendCommand(command)
-
-        self.__sendCommand(commandCheck)
-        readvolt = float(self.__readOutput())
+        readvolt = self.readVoltage(channel)
 
         if readvolt * 1000 != mV:
             raise TenmaException("Set {set}mV, but read {read}mV".format(
