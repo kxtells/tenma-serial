@@ -69,6 +69,8 @@ try:
         T.OFF()
 
 except TenmaException as e:
+    print "Lib ERROR: ", repr(e)
+except Exception as e:
     print "ERROR: ", repr(e)
 finally:
     if VERB:
