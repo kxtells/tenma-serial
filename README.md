@@ -14,9 +14,9 @@ Python and the serial library:
 
 Shortcomings:
 
-    * Cannot read current consumption. (Function implemented, does not seem to work)
-    * Always saves to memory 1. (Function implemented, POWER SUPPLY not behaving as expected. Restores all memories correctly though.
-    * The physical buttons are blocked for a while after connecting.
+ * Cannot read current consumption. (Function implemented, does not seem to work)
+ * Always saves to memory 1. (Function implemented, POWER SUPPLY not behaving as expected. Restores all memories correctly though.
+ * The physical buttons are blocked for a while after connecting.
 
 
 ## Usage examples
