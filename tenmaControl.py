@@ -57,16 +57,16 @@ try:
         print "Voltage:", volt
         print "Current:", curr
 
+    if args["off"]:
+        if VERB:
+            print "Turning OUTPUT OFF"
+        T.OFF()
 
     if args["on"]:
         if VERB:
             print "Turning OUTPUT ON"
         T.ON()
 
-    if args["off"]:
-        if VERB:
-            print "Turning OUTPUT OFF"
-        T.OFF()
 
 except TenmaException as e:
     print "Lib ERROR: ", repr(e)
