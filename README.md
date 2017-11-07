@@ -4,7 +4,9 @@
 
 A small command line program / library to setup a Tenma 72-2540 DC POWER SUPPLY from your computer via SERIAL.
 
-Coming back from holidays was hard. So I spent some time with a little game (tongue)
+Coming back from holidays was hard. So I spent some time with a little game (tongue). You'll find a small explanation of the code in:
+
+[https://jcastellssala.com/2017/10/31/tenma72-2540-linux-control/](https://jcastellssala.com/2017/10/31/tenma72-2540-linux-control/)
 
 ## Requirements
 
