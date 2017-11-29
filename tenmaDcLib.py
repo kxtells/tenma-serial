@@ -25,6 +25,12 @@ class Tenma72_2540:
         self.MAX_MV = 30000
         self.DEBUG = debug
 
+    def setPort(self, serialPort):
+        self.ser = serial.Serial(port=serialPort,
+            baudrate=9600,
+            parity=serial.PARITY_NONE,
+            stopbits=serial.STOPBITS_ONE)
+
     def __sendCommand(self, command):
         if self.DEBUG:
             print ">> ", command
