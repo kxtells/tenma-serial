@@ -191,11 +191,15 @@ class gtkController():
                 gtk.STOCK_DIALOG_ERROR).show()
 
 def main():
+    cdir = os.path.dirname(__file__)
+
+    print cdir
+    print os.path.join(cdir, 'logo.png'),
+
     notify.init(APPINDICATOR_ID)
     controller = gtkController()
-    #indicator = appindicator.Indicator.new(APPINDICATOR_ID, gtk.STOCK_YES, appindicator.IndicatorCategory.SYSTEM_SERVICES)
     indicator = appindicator.Indicator.new(APPINDICATOR_ID,
-        os.path.abspath('logo.png'),
+        os.path.abspath(os.path.join(cdir, 'logo.png')),
         appindicator.IndicatorCategory.SYSTEM_SERVICES)
     indicator.set_status(appindicator.IndicatorStatus.ACTIVE)
     indicator.set_menu(controller.build_gtk_menu())
