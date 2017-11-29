@@ -50,6 +50,7 @@ def serial_ports():
 class gtkController():
     def __init__(self):
         self.serialPort = "No Port"
+        self.serialMenu = None
         self.T = None
         self.itemSet = []
         pass
@@ -82,14 +83,34 @@ class gtkController():
 
         self.item_connectedPort.set_label(self.serialPort)
 
-    def build_serial_submenu(self):
-        serialMenu = gtk.Menu()
+    def build_serial_submenu(self, source):
+        """
+            Build the serialSubmenu assuming that it is un runtime (remove,
+            existing entries and call show in all new entries)
+        """
+        if not self.serialMenu:
+            self.serialMenu = gtk.Menu()
+
+        for entry in self.serialMenu.get_children():
+            self.serialMenu.remove(entry)
+
         for serialPort in serial_ports():
             menuEntry = gtk.MenuItem(serialPort)
             menuEntry.connect('activate', self.portSelected)
-            serialMenu.append(menuEntry)
+            self.serialMenu.append(menuEntry)
+            menuEntry.show()
 
-        return serialMenu
+        sep = gtk.SeparatorMenuItem()
+        self.serialMenu.append(sep)
+        sep.show()
+
+        menuEntry = gtk.MenuItem("Reload")
+        menuEntry.connect('activate', self.build_serial_submenu)
+        self.serialMenu.append(menuEntry)
+        menuEntry.show()
+
+
+        return self.serialMenu
 
 
     def setItemSetStatus(self, onOff):
@@ -99,7 +120,7 @@ class gtkController():
             [i.set_sensitive(False) for i in self.itemSet]
 
     def build_gtk_menu(self):
-        serialMenu = self.build_serial_submenu()
+        serialMenu = self.build_serial_submenu(None)
 
         menu = gtk.Menu()
 
