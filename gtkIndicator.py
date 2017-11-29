@@ -1,3 +1,5 @@
+#!/usr/bin/python
+
 import gi
 
 gi.require_version('Gtk', '3.0')
@@ -78,7 +80,7 @@ class gtkController():
             notify.Notification.new("<b>CONNECTED TO</b>", ver, None).show()
             self.setItemSetStatus(True)
 
-	self.item_connectedPort.set_label(self.serialPort)
+        self.item_connectedPort.set_label(self.serialPort)
 
     def build_serial_submenu(self):
         serialMenu = gtk.Menu()

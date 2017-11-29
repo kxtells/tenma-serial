@@ -1,3 +1,10 @@
+# Tenma DC power supply controllers
+
+Provides two basic controllers (tested on Linux) for a TENMA DC power supply via serial interface.
+
+ * tenmaControl (command line utility)
+ * gtkIndicator (GTK indicator to sit on tray)
+
 # tenmaControl
 
 ## What is this?
@@ -53,3 +60,9 @@ For example: 2.2 Amperes 5V:
 ### Print everything
 
 	python tenmaControl.py -c 2200 -v 5000 --save 4 --verbose --debug /dev/ttyUSB0
+
+# gtkIndicator
+
+A very simple GTK indicator to control a tenma DC power supply from a graphical desktop. Provides ON, OFF and RESET facilities. Simply start it with:
+
+	./gtkIndicator.py
