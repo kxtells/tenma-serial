@@ -42,11 +42,11 @@ For example: 2.2 Amperes 5V:
 
 ### Turn on the channel output
 
-	python tenmaControl.py -on /dev/ttyUSB0
+	python tenmaControl.py --on /dev/ttyUSB0
 
 ### Turn OFF the channel output
 
-	python tenmaControl.py -on /dev/ttyUSB0
+	python tenmaControl.py --off /dev/ttyUSB0
 
 ### Load an existing memory
 
