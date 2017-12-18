@@ -34,7 +34,7 @@ class Tenma72_2540:
             stopbits=serial.STOPBITS_ONE)
 
         self.NCHANNELS = 1
-        self.NCONFS = 4
+        self.NCONFS = 5 #Only 4 physical buttons. But 5 memories are available
         self.MAX_MA = 5000
         self.MAX_MV = 30000
         self.DEBUG = debug
@@ -234,7 +234,9 @@ class Tenma72_2540:
 
     def saveConf(self, conf):
         """
-            Save current configuration
+            Save current configuration. Does not work as one would expect. SAV(4)
+            will not save directly to memory 4. We actually need to recall memory
+            4, and then save the configuration.
         """
         if conf > self.NCONFS:
             raise TenmaException("Trying to set M{channel} with only {nch} confs".format(
@@ -244,6 +246,39 @@ class Tenma72_2540:
 
         command = "SAV{conf}".format(conf=conf)
         self.__sendCommand(command)
+
+    def saveConfFlow(self, conf, channel):
+        """
+            Performs a full save flow for the unit.
+            Since saveConf only calls the SAV<NR1> command, and that does not
+            work as advertised, or expected, at least in 72_2540.
+
+            This will:
+             - turn off the output
+             - recall memory conf
+             - Save to that memory conf
+
+            :param conf: Memory index to store to
+            :param channel: Channel with output to store
+        """
+
+        self.OFF()
+
+        # Read current voltage
+        volt = self.readVoltage(channel)
+        curr = self.readCurrent(channel)
+
+        self.recallConf(conf) # Load conf
+
+        self.setVoltage(channel, volt * 1000) # Load the new conf in the panel
+        self.setCurrent(channel, curr * 1000) # Load the new conf in the panel
+
+        self.saveConf(conf)   # Save currant status in current memory
+
+        print "Saved to Memory", conf
+        print "Voltage:", volt
+        print "Current:", curr
+
 
     def recallConf(self, conf):
         """

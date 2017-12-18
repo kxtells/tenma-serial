@@ -77,13 +77,7 @@ try:
         if VERB:
             print "Saving to Memory", args["save"]
 
-        T.saveConf( args["save"])
-        volt = T.readVoltage(args["channel"])
-        curr = T.readCurrent(args["channel"])
-
-        print "Saved to Memory", args["save"]
-        print "Voltage:", volt
-        print "Current:", curr
+        T.saveConfFlow(args["save"], args["channel"])
 
     if args["recall"]:
         if VERB:
