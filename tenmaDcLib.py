@@ -51,7 +51,25 @@ class Tenma72_2540:
         self.ser.write(command)
         time.sleep(0.5) #give it time to process
 
+
+    def __readBytes(self):
+        """
+            Read serial otput as a stream of bytes
+        """
+        out=[]
+        while self.ser.inWaiting() > 0:
+            out.append(ord(self.ser.read(1)))
+
+        if self.DEBUG:
+            print "<< ", ["0x{:02x}".format(v) for v in out]
+
+        return out
+
+
     def __readOutput(self):
+        """
+            Read serial otput as a string
+        """
         out=""
         while self.ser.inWaiting() > 0:
             out += self.ser.read(1)
@@ -62,9 +80,48 @@ class Tenma72_2540:
         return out
 
     def getVersion(self):
+        """
+            Returns a single string with the version of the Tenma Device and Protocol user
+        """
         self.__sendCommand("*IDN?")
         return self.__readOutput()
 
+    def getStatus(self):
+        """
+            Returns the power supply status as a dictionary of values
+        """
+        self.__sendCommand("STATUS?")
+        statusBytes = self.__readBytes()
+
+        if len(statusBytes) > 1:
+            raise TenmaException("Received more bytes than expected when reading status")
+
+        status = statusBytes[0]
+
+        ch1mode   = (status & 0x01)
+        ch2mode   = (status & 0x02)
+        tracking  = (status & 0x0C) >> 2
+        beep      = (status & 0x10)
+        lock      = (status & 0x20)
+        out       = (status & 0x40)
+
+        if tracking == 0:
+            tracking = "Independent"
+        elif tracking == 1:
+            tracking = "Tracking Series"
+        elif tracking == 3:
+            tracking = "Tracking Parallel"
+        else:
+            tracking = "Unknown"
+
+        return {
+                "ch1Mode" :  "C.V" if ch1mode else "C.C",
+                "ch2Mode" :  "C.V" if ch2mode else "C.C",
+                "Tracking" : tracking,
+                "BeepEnabled": bool(beep),
+                "lockEnabled": bool(lock),
+                "outEnabled": bool(out)
+        }
 
     def readCurrent(self, channel):
         if channel > self.NCHANNELS:
