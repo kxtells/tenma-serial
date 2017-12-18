@@ -24,8 +24,10 @@ parser = argparse.ArgumentParser(description='Control a Tenma 72-2540 power supp
 parser.add_argument('device', default="/dev/ttyUSB0")
 parser.add_argument('-v','--voltage', help='mV to set', required=False, type=int)
 parser.add_argument('-c','--current', help='mA to set', required=False, type=int)
+parser.add_argument('-C','--channel', help='channel to set (if not provided, 1 will be used)', required=False, type=int, default=1)
 parser.add_argument('-s','--save', help='Save current configuration to Memory', required=False, type=int)
 parser.add_argument('-r','--recall', help='Load configuration from Memory', required=False, type=int)
+parser.add_argument('-S','--status', help='Retrieve and print system status', required=False, action="store_true", default=False)
 parser.add_argument('--on', help='Set output to ON', action="store_true", default=False)
 parser.add_argument('--off', help='Set output to OFF', action="store_true", default=False)
 parser.add_argument('--verbose', help='Chatty program', action="store_true", default=False)
@@ -40,20 +42,20 @@ try:
     if args["voltage"]:
         if VERB:
             print "Setting voltage to ", args["voltage"]
-        T.setVoltage(1, args["voltage"])
+        T.setVoltage(args["channel"], args["voltage"])
 
     if args["current"]:
         if VERB:
             print "Setting current to ", args["current"]
-        T.setCurrent(1, args["current"])
+        T.setCurrent(args["channel"], args["current"])
 
     if args["save"]:
         if VERB:
             print "Saving to Memory", args["save"]
 
         T.saveConf( args["save"])
-        volt = T.readVoltage(1)
-        curr = T.readCurrent(1)
+        volt = T.readVoltage(args["channel"])
+        curr = T.readCurrent(args["channel"])
 
         print "Saved to Memory", args["save"]
         print "Voltage:", volt
@@ -64,8 +66,8 @@ try:
             print "Loading from Memory: ", args["recall"]
 
         T.recallConf(args["recall"])
-        volt = T.readVoltage(1)
-        curr = T.readCurrent(1)
+        volt = T.readVoltage(args["channel"])
+        curr = T.readCurrent(args["channel"])
 
         print "Loaded from Memory: ", args["recall"]
         print "Voltage:", volt
@@ -81,6 +83,10 @@ try:
             print "Turning OUTPUT ON"
         T.ON()
 
+    if args["status"]:
+        if VERB:
+            print "Retrieving status"
+        print T.getStatus()
 
 except TenmaException as e:
     print "Lib ERROR: ", repr(e)
