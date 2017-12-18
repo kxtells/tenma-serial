@@ -28,6 +28,10 @@ parser.add_argument('-C','--channel', help='channel to set (if not provided, 1 w
 parser.add_argument('-s','--save', help='Save current configuration to Memory', required=False, type=int)
 parser.add_argument('-r','--recall', help='Load configuration from Memory', required=False, type=int)
 parser.add_argument('-S','--status', help='Retrieve and print system status', required=False, action="store_true", default=False)
+parser.add_argument('--ocp-enable', help='Enable overcurrent protection', required=False, action="store_true", default=False)
+parser.add_argument('--ocp-disable', help='Disable overcurrent pritection', required=False, action="store_true", default=False)
+parser.add_argument('--ovp-enable', help='Enable overvoltage protection', required=False, action="store_true", default=False)
+parser.add_argument('--ovp-disable', help='Disable overvoltage pritection', required=False, action="store_true", default=False)
 parser.add_argument('--on', help='Set output to ON', action="store_true", default=False)
 parser.add_argument('--off', help='Set output to OFF', action="store_true", default=False)
 parser.add_argument('--verbose', help='Chatty program', action="store_true", default=False)
@@ -38,6 +42,26 @@ try:
     VERB = args["verbose"]
     T = Tenma72_2540(args["device"], debug=args["debug"])
     print "VERSION: ",T.getVersion()
+
+    if args["ocp_enable"]:
+        if VERB:
+            print "Enable overcurrent protection"
+        T.setOCP(True)
+
+    if args["ocp_disable"]:
+        if VERB:
+            print "Disable overcurrent protection"
+        T.setOCP(False)
+
+    if args["ovp_enable"]:
+        if VERB:
+            print "Enable overvoltage protection"
+        T.setOVP(True)
+
+    if args["ovp_disable"]:
+        if VERB:
+            print "Disable overvoltage protection"
+        T.setOVP(False)
 
     if args["voltage"]:
         if VERB:
@@ -87,6 +111,7 @@ try:
         if VERB:
             print "Retrieving status"
         print T.getStatus()
+
 
 except TenmaException as e:
     print "Lib ERROR: ", repr(e)

@@ -259,6 +259,32 @@ class Tenma72_2540:
         command = "RCL{conf}".format(conf=conf)
         self.__sendCommand(command)
 
+    def setOCP(self, enable=True):
+        """
+            Enable or disable OCP.
+
+            There's no feedback from the serial connection to determine
+            whether OCP was set or not.
+
+            :param enable: Boolean to enable or disable
+        """
+        conf = 1 if enable else 0
+        command = "OCP{conf}".format(conf=conf)
+        self.__sendCommand(command)
+
+    def setOVP(self, enable=True):
+        """
+            Enable or disable OVP
+
+            There's no feedback from the serial connection to determine
+            whether OVP was set or not.
+
+            :param enable: Boolean to enable or disable
+        """
+        conf = 1 if enable else 0
+        command = "OVP{conf}".format(conf=conf)
+        self.__sendCommand(command)
+
     def ON(self):
         """
             Turns on the output
