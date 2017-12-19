@@ -339,17 +339,3 @@ class Tenma72_2540:
 
     def close(self):
         self.ser.close()
-
-#T = Tenma72_2540('/dev/ttyUSB0')
-#print T.getVersion()
-##T.setCurrent(1, 2200)
-##T.setVoltage(1, 6000)
-#
-#T.ON()
-#
-#print T.runningVoltage(1)
-#print T.runningCurrent(1)
-#
-#T.OFF()
-#
-#T.close()
