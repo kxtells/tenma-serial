@@ -22,8 +22,8 @@ from tenmaDcLib import *
 
 parser = argparse.ArgumentParser(description='Control a Tenma 72-2540 power supply connected to a serial port')
 parser.add_argument('device', default="/dev/ttyUSB0")
-parser.add_argument('-v','--voltage', help='mV to set', required=False, type=int)
-parser.add_argument('-c','--current', help='mA to set', required=False, type=int)
+parser.add_argument('-v','--voltage', help='set mV', required=False, type=int)
+parser.add_argument('-c','--current', help='set mA', required=False, type=int)
 parser.add_argument('-C','--channel', help='channel to set (if not provided, 1 will be used)', required=False, type=int, default=1)
 parser.add_argument('-s','--save', help='Save current configuration to Memory', required=False, type=int)
 parser.add_argument('-r','--recall', help='Load configuration from Memory', required=False, type=int)
@@ -36,12 +36,16 @@ parser.add_argument('--on', help='Set output to ON', action="store_true", defaul
 parser.add_argument('--off', help='Set output to OFF', action="store_true", default=False)
 parser.add_argument('--verbose', help='Chatty program', action="store_true", default=False)
 parser.add_argument('--debug', help='print serial commands', action="store_true", default=False)
+parser.add_argument('--script', help='runs from script. Only print result of query, no version', action="store_true", default=False)
+parser.add_argument('--actualCurrent', help='returns the actual current reading', action="store_true", default=False)
+parser.add_argument('--actualVoltage', help='returns the actual voltage reading', action="store_true", default=False)
 args = vars(parser.parse_args())
 
 try:
     VERB = args["verbose"]
     T = Tenma72_2540(args["device"], debug=args["debug"])
-    print "VERSION: ",T.getVersion()
+    if not args["script"]:
+        print "VERSION: ",T.getVersion()
 
     if args["ocp_enable"]:
         if VERB:
@@ -105,6 +109,17 @@ try:
         if VERB:
             print "Retrieving status"
         print T.getStatus()
+
+    if args["actualCurrent"]:
+        if VERB:
+            print "Retrieving actual Current"
+        print T.runningCurrent(args["channel"])
+
+    if args["actualVoltage"]:
+        if VERB:
+            print "Retrieving actual Voltage"
+        print T.runningVoltage(args["channel"])
+
 
 
 except TenmaException as e:

@@ -212,7 +212,7 @@ class Tenma72_2540:
                 nch=self.NCHANNELS
                 ))
 
-        command = "IOUT{channel}".format(channel=channel)
+        command = "IOUT{channel}?".format(channel=channel)
         self.__sendCommand(command)
         readcurrent = self.__readOutput()
         return readcurrent
@@ -227,7 +227,7 @@ class Tenma72_2540:
                 nch=self.NCHANNELS
                 ))
 
-        command = "VOUT{channel}".format(channel=channel)
+        command = "VOUT{channel}?".format(channel=channel)
         self.__sendCommand(command)
         readvolt = self.__readOutput()
         return readvolt
