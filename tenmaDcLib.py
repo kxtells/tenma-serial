@@ -47,35 +47,33 @@ class Tenma72_2540:
 
     def __sendCommand(self, command):
         if self.DEBUG:
-            print ">> ", command
-        self.ser.write(command)
+            print(">> ", command)
+        self.ser.write(command.encode('ascii'))
         time.sleep(0.5) #give it time to process
-
 
     def __readBytes(self):
         """
-            Read serial otput as a stream of bytes
+            Read serial output as a stream of bytes
         """
         out=[]
         while self.ser.inWaiting() > 0:
             out.append(ord(self.ser.read(1)))
 
         if self.DEBUG:
-            print "<< ", ["0x{:02x}".format(v) for v in out]
+            print("<< ", ["0x{:02x}".format(v) for v in out])
 
         return out
-
 
     def __readOutput(self):
         """
             Read serial otput as a string
         """
-        out=""
+        out = ""
         while self.ser.inWaiting() > 0:
-            out += self.ser.read(1)
+            out += self.ser.read(1).decode('ascii')
 
         if self.DEBUG:
-            print "<< ", out
+            print("<< ", out)
 
         return out
 
@@ -273,11 +271,12 @@ class Tenma72_2540:
         self.setVoltage(channel, volt * 1000) # Load the new conf in the panel
         self.setCurrent(channel, curr * 1000) # Load the new conf in the panel
 
-        self.saveConf(conf)   # Save currant status in current memory
+        self.saveConf(conf)   # Save current status in current memory
 
-        print "Saved to Memory", conf
-        print "Voltage:", volt
-        print "Current:", curr
+        if self.DEBUG:
+            print("Saved to Memory", conf)
+            print("Voltage:", volt)
+            print("Current:", curr)
 
 
     def recallConf(self, conf):
@@ -335,7 +334,6 @@ class Tenma72_2540:
 
         command = "OUT0"
         self.__sendCommand(command)
-
 
     def close(self):
         self.ser.close()

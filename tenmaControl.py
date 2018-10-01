@@ -45,88 +45,87 @@ try:
     VERB = args["verbose"]
     T = Tenma72_2540(args["device"], debug=args["debug"])
     if not args["script"]:
-        print "VERSION: ",T.getVersion()
+        print("VERSION: ", T.getVersion())
 
     if args["ocp_enable"]:
         if VERB:
-            print "Enable overcurrent protection"
+            print("Enable overcurrent protection")
         T.setOCP(True)
 
     if args["ocp_disable"]:
         if VERB:
-            print "Disable overcurrent protection"
+            print("Disable overcurrent protection")
         T.setOCP(False)
 
     if args["ovp_enable"]:
         if VERB:
-            print "Enable overvoltage protection"
+            print("Enable overvoltage protection")
         T.setOVP(True)
 
     if args["ovp_disable"]:
         if VERB:
-            print "Disable overvoltage protection"
+            print("Disable overvoltage protection")
         T.setOVP(False)
 
     if args["voltage"]:
         if VERB:
-            print "Setting voltage to ", args["voltage"]
+            print("Setting voltage to ", args["voltage"])
         T.setVoltage(args["channel"], args["voltage"])
 
     if args["current"]:
         if VERB:
-            print "Setting current to ", args["current"]
+            print("Setting current to ", args["current"])
         T.setCurrent(args["channel"], args["current"])
 
     if args["save"]:
         if VERB:
-            print "Saving to Memory", args["save"]
+            print("Saving to Memory", args["save"])
 
         T.saveConfFlow(args["save"], args["channel"])
 
     if args["recall"]:
         if VERB:
-            print "Loading from Memory: ", args["recall"]
+            print("Loading from Memory: ", args["recall"])
 
         T.recallConf(args["recall"])
         volt = T.readVoltage(args["channel"])
         curr = T.readCurrent(args["channel"])
 
-        print "Loaded from Memory: ", args["recall"]
-        print "Voltage:", volt
-        print "Current:", curr
+        print("Loaded from Memory: ", args["recall"])
+        print("Voltage:", volt)
+        print("Current:", curr)
 
     if args["off"]:
         if VERB:
-            print "Turning OUTPUT OFF"
+            print("Turning OUTPUT OFF")
         T.OFF()
 
     if args["on"]:
         if VERB:
-            print "Turning OUTPUT ON"
+            print("Turning OUTPUT ON")
         T.ON()
 
     if args["status"]:
         if VERB:
-            print "Retrieving status"
-        print T.getStatus()
+            print("Retrieving status")
+        print(T.getStatus())
 
     if args["actualCurrent"]:
         if VERB:
-            print "Retrieving actual Current"
-        print T.runningCurrent(args["channel"])
+            print("Retrieving actual Current")
+        print(T.runningCurrent(args["channel"]))
 
     if args["actualVoltage"]:
         if VERB:
-            print "Retrieving actual Voltage"
-        print T.runningVoltage(args["channel"])
-
+            print("Retrieving actual Voltage")
+        print(T.runningVoltage(args["channel"]))
 
 
 except TenmaException as e:
-    print "Lib ERROR: ", repr(e)
-except Exception as e:
-    print "ERROR: ", repr(e)
+    print("Lib ERROR: ", repr(e))
+#except Exception as e:
+#    print("ERROR: ", repr(e))
 finally:
     if VERB:
-        print "Closing connection"
+        print("Closing connection")
     T.close()
