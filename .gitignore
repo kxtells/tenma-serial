@@ -1,1 +1,10 @@
 *.pyc
+.eggs/
+.tox/
+AUTHORS
+ChangeLog
+tenma_serial.egg-info/
+tests/.coverage
+tests/coverage.xml
+tests/htmlcov/
+tests/test-results/

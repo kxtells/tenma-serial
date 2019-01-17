@@ -18,8 +18,14 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>
 """
 
+import glob
+import os
+import signal
+import sys
 
 import gi
+import pkg_resources
+import serial
 
 gi.require_version('Gtk', '3.0')
 gi.require_version('AppIndicator3', '0.1')
@@ -29,10 +35,8 @@ from gi.repository import Gtk as gtk
 from gi.repository import AppIndicator3 as appindicator
 from gi.repository import Notify as notify
 
-import signal
 from tenmaDcLib import *
 
-import serial, sys, glob, os
 
 APPINDICATOR_ID = 'Tenma DC Power'
 
@@ -66,6 +70,7 @@ def serial_ports():
             pass
     return result
 
+
 class gtkController():
     def __init__(self):
         self.serialPort = "No Port"
@@ -86,14 +91,14 @@ class gtkController():
         except Exception as e:
             self.setItemSetStatus(False)
             notify.Notification.new("<b>ERROR</b>", repr(e),
-                gtk.STOCK_DIALOG_ERROR).show()
+                                    gtk.STOCK_DIALOG_ERROR).show()
             self.serialPort = oldPort
 
         ver = self.T.getVersion()
         if not ver:
             notify.Notification.new("<b>ERROR</b>",
-                "No response on %s" % self.serialPort,
-                gtk.STOCK_DIALOG_ERROR).show()
+                                    "No response on %s" % self.serialPort,
+                                    gtk.STOCK_DIALOG_ERROR).show()
             self.serialPort = oldPort
             self.setItemSetStatus(False)
         else:
@@ -128,9 +133,7 @@ class gtkController():
         self.serialMenu.append(menuEntry)
         menuEntry.show()
 
-
         return self.serialMenu
-
 
     def setItemSetStatus(self, onOff):
         if onOff:
@@ -184,42 +187,38 @@ class gtkController():
 
         return menu
 
-    def quit(self,source):
+    def quit(self, source):
         gtk.main_quit(self)
 
-    def tenmaTurnOn(self,source):
+    def tenmaTurnOn(self, source):
         try:
             self.T.ON()
         except Exception as e:
             notify.Notification.new("<b>ERROR</b>", repr(e),
-                gtk.STOCK_DIALOG_ERROR).show()
+                                    gtk.STOCK_DIALOG_ERROR).show()
 
-    def tenmaTurnOff(self,source):
+    def tenmaTurnOff(self, source):
         try:
             self.T.OFF()
         except Exception as e:
             notify.Notification.new("<b>ERROR</b>", repr(e),
-                gtk.STOCK_DIALOG_ERROR).show()
+                                    gtk.STOCK_DIALOG_ERROR).show()
 
-    def tenmaReset(self,source):
+    def tenmaReset(self, source):
         try:
             self.T.OFF()
             self.T.ON()
         except Exception as e:
             notify.Notification.new("<b>ERROR</b>", repr(e),
-                gtk.STOCK_DIALOG_ERROR).show()
+                                    gtk.STOCK_DIALOG_ERROR).show()
+
 
 def main():
-    cdir = os.path.dirname(__file__)
-
-    print cdir
-    print os.path.join(cdir, 'logo.png'),
-
     notify.init(APPINDICATOR_ID)
     controller = gtkController()
     indicator = appindicator.Indicator.new(APPINDICATOR_ID,
-        os.path.abspath(os.path.join(cdir, 'logo.png')),
-        appindicator.IndicatorCategory.SYSTEM_SERVICES)
+                                           pkg_resources.resource_filename(__name__, 'logo.png'),
+                                           appindicator.IndicatorCategory.SYSTEM_SERVICES)
     indicator.set_status(appindicator.IndicatorStatus.ACTIVE)
     indicator.set_menu(controller.build_gtk_menu())
     signal.signal(signal.SIGINT, signal.SIG_DFL)
