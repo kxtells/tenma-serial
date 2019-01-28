@@ -20,8 +20,10 @@
 import serial
 import time
 
+
 class TenmaException(Exception):
     pass
+
 
 class Tenma72_2540:
     """
@@ -29,33 +31,35 @@ class Tenma72_2540:
     """
     def __init__(self, serialPort, debug=False):
         self.ser = serial.Serial(port=serialPort,
-            baudrate=9600,
-            parity=serial.PARITY_NONE,
-            stopbits=serial.STOPBITS_ONE)
+                                 baudrate=9600,
+                                 parity=serial.PARITY_NONE,
+                                 stopbits=serial.STOPBITS_ONE)
 
         self.NCHANNELS = 1
-        self.NCONFS = 5 #Only 4 physical buttons. But 5 memories are available
+        # Only 4 physical buttons. But 5 memories are available
+        self.NCONFS = 5
         self.MAX_MA = 5000
         self.MAX_MV = 30000
         self.DEBUG = debug
 
     def setPort(self, serialPort):
         self.ser = serial.Serial(port=serialPort,
-            baudrate=9600,
-            parity=serial.PARITY_NONE,
-            stopbits=serial.STOPBITS_ONE)
+                                 baudrate=9600,
+                                 parity=serial.PARITY_NONE,
+                                 stopbits=serial.STOPBITS_ONE)
 
     def __sendCommand(self, command):
         if self.DEBUG:
             print(">> ", command)
         self.ser.write(command.encode('ascii'))
-        time.sleep(0.5) #give it time to process
+        # Give it time to process
+        time.sleep(0.5)
 
     def __readBytes(self):
         """
             Read serial output as a stream of bytes
         """
-        out=[]
+        out = []
         while self.ser.inWaiting() > 0:
             out.append(ord(self.ser.read(1)))
 
@@ -96,12 +100,12 @@ class Tenma72_2540:
 
         status = statusBytes[0]
 
-        ch1mode   = (status & 0x01)
-        ch2mode   = (status & 0x02)
-        tracking  = (status & 0x0C) >> 2
-        beep      = (status & 0x10)
-        lock      = (status & 0x20)
-        out       = (status & 0x40)
+        ch1mode = (status & 0x01)
+        ch2mode = (status & 0x02)
+        tracking = (status & 0x0C) >> 2
+        beep = (status & 0x10)
+        lock = (status & 0x20)
+        out = (status & 0x40)
 
         if tracking == 0:
             tracking = "Independent"
@@ -113,12 +117,12 @@ class Tenma72_2540:
             tracking = "Unknown"
 
         return {
-                "ch1Mode" :  "C.V" if ch1mode else "C.C",
-                "ch2Mode" :  "C.V" if ch2mode else "C.C",
-                "Tracking" : tracking,
-                "BeepEnabled": bool(beep),
-                "lockEnabled": bool(lock),
-                "outEnabled": bool(out)
+            "ch1Mode": "C.V" if ch1mode else "C.C",
+            "ch2Mode": "C.V" if ch2mode else "C.C",
+            "Tracking": tracking,
+            "BeepEnabled": bool(beep),
+            "lockEnabled": bool(lock),
+            "outEnabled": bool(out)
         }
 
     def readCurrent(self, channel):
@@ -126,7 +130,7 @@ class Tenma72_2540:
             raise TenmaException("Trying to read CH{channel} with only {nch} channels".format(
                 channel=channel,
                 nch=self.NCHANNELS
-                ))
+            ))
 
         commandCheck = "ISET{channel}?".format(channel=1)
         self.__sendCommand(commandCheck)
@@ -137,20 +141,19 @@ class Tenma72_2540:
             raise TenmaException("Trying to set CH{channel} with only {nch} channels".format(
                 channel=channel,
                 nch=self.NCHANNELS
-                ))
+            ))
 
         if mA > self.MAX_MA:
             raise TenmaException("Trying to set CH{channel} to {ma}mA, the maximum is {max}mA".format(
                 channel=channel,
                 ma=mA,
                 max=self.MAX_MA
-                ))
+            ))
 
         command = "ISET{channel}:{amperes:.3f}"
 
         A = float(mA) / 1000.0
         command = command.format(channel=1, amperes=A)
-
 
         self.__sendCommand(command)
         readcurrent = self.readCurrent(channel)
@@ -159,14 +162,14 @@ class Tenma72_2540:
             raise TenmaException("Set {set}mA, but read {read}mA".format(
                 set=mA,
                 read=readcurrent * 1000,
-                ))
+            ))
 
     def readVoltage(self, channel):
         if channel > self.NCHANNELS:
             raise TenmaException("Trying to read CH{channel} with only {nch} channels".format(
                 channel=channel,
                 nch=self.NCHANNELS
-                ))
+            ))
 
         commandCheck = "VSET{channel}?".format(channel=1)
         self.__sendCommand(commandCheck)
@@ -177,14 +180,14 @@ class Tenma72_2540:
             raise TenmaException("Trying to set CH{channel} with only {nch} channels".format(
                 channel=channel,
                 nch=self.NCHANNELS
-                ))
+            ))
 
         if mV > self.MAX_MV:
             raise TenmaException("Trying to set CH{channel} to {mv}mV, the maximum is {max}mV".format(
                 channel=channel,
                 mv=mV,
                 max=self.MAX_MV
-                ))
+            ))
 
         command = "VSET{channel}:{volt:.2f}"
 
@@ -198,7 +201,7 @@ class Tenma72_2540:
             raise TenmaException("Set {set}mV, but read {read}mV".format(
                 set=mV,
                 read=readvolt * 1000,
-                ))
+            ))
 
     def runningCurrent(self, channel):
         """
@@ -208,7 +211,7 @@ class Tenma72_2540:
             raise TenmaException("Trying to read CH{channel} with only {nch} channels".format(
                 channel=channel,
                 nch=self.NCHANNELS
-                ))
+            ))
 
         command = "IOUT{channel}?".format(channel=channel)
         self.__sendCommand(command)
@@ -223,7 +226,7 @@ class Tenma72_2540:
             raise TenmaException("Trying to read CH{channel} with only {nch} channels".format(
                 channel=channel,
                 nch=self.NCHANNELS
-                ))
+            ))
 
         command = "VOUT{channel}?".format(channel=channel)
         self.__sendCommand(command)
@@ -240,7 +243,7 @@ class Tenma72_2540:
             raise TenmaException("Trying to set M{channel} with only {nch} confs".format(
                 channel=conf,
                 nch=self.NCONFS
-                ))
+            ))
 
         command = "SAV{conf}".format(conf=conf)
         self.__sendCommand(command)
@@ -266,10 +269,13 @@ class Tenma72_2540:
         volt = self.readVoltage(channel)
         curr = self.readCurrent(channel)
 
-        self.recallConf(conf) # Load conf
+        # Load conf
+        self.recallConf(conf)
 
-        self.setVoltage(channel, volt * 1000) # Load the new conf in the panel
-        self.setCurrent(channel, curr * 1000) # Load the new conf in the panel
+        # Load the new conf in the panel
+        self.setVoltage(channel, volt * 1000)
+        # Load the new conf in the panel
+        self.setCurrent(channel, curr * 1000)
 
         self.saveConf(conf)   # Save current status in current memory
 
@@ -277,7 +283,6 @@ class Tenma72_2540:
             print("Saved to Memory", conf)
             print("Voltage:", volt)
             print("Current:", curr)
-
 
     def recallConf(self, conf):
         """
@@ -288,7 +293,7 @@ class Tenma72_2540:
             raise TenmaException("Trying to recall M{channel} with only {nch} confs".format(
                 channel=conf,
                 nch=self.NCONFS
-                ))
+            ))
 
         command = "RCL{conf}".format(conf=conf)
         self.__sendCommand(command)
