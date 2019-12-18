@@ -49,7 +49,7 @@ class Tenma72_2540:
         self.SAFE_MA = mA
 
     def setSafeVoltage(self, mV):
-        self.SAFE_MV
+        self.SAFE_MV = mV
 
     def setPort(self, serialPort):
         self.ser = serial.Serial(port=serialPort,
