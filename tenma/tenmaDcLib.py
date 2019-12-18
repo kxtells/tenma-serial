@@ -45,6 +45,12 @@ class Tenma72_2540:
         self.SAFE_MV = 12000
         self.DEBUG = debug
 
+    def setSafeCurrent(self, mA):
+        self.SAFE_MA = mA
+
+    def setSafeVoltage(self, mV):
+        self.SAFE_MV
+
     def setPort(self, serialPort):
         self.ser = serial.Serial(port=serialPort,
                                  baudrate=9600,
