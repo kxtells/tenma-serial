@@ -173,7 +173,7 @@ class Tenma72_2540:
                 safe_mA=self.SAFE_MA
             ))
             if not click.confirm('Do you want to continue?', default=True):
-                print("Aborting.")
+                print("Aborting. If you want, use --safeC to allow for a different safe current.")
                 return
 
         command = "ISET{channel}:{amperes:.3f}"
@@ -230,7 +230,7 @@ class Tenma72_2540:
                 safe_mV=self.SAFE_MV
             ))
             if not click.confirm('Do you want to continue?', default=True):
-                print("Aborting.")
+                print("Aborting. If you want, use --safeV to allow for a different safe Voltage.")
                 return
 
         command = "VSET{channel}:{volt:.2f}"
@@ -391,7 +391,7 @@ class Tenma72_2540:
                 safe_mA=self.SAFE_MA
             ))
             if not click.confirm('Do you want to continue?', default=True):
-                print("Aborting.")
+                print("Aborting. Either use --current to set a new output current or use --safeC to allow for a different safe current")
                 return
 
         # ToDo: allow channels other than "1"
@@ -402,7 +402,7 @@ class Tenma72_2540:
                 safe_mV=self.SAFE_MV
             ))
             if not click.confirm('Do you want to continue?', default=True):
-                print("Aborting.")
+                print("Aborting. Either use --voltage to set a new output voltage or use --safeV to allow for a different safe voltage")
                 return
 
         command = "OUT1"

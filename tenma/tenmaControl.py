@@ -73,16 +73,6 @@ def main():
                 print("Disable overvoltage protection")
             T.setOVP(False)
 
-        if args["voltage"]:
-            if VERB:
-                print("Setting voltage to ", args["voltage"])
-            T.setVoltage(args["channel"], args["voltage"])
-
-        if args["current"]:
-            if VERB:
-                print("Setting current to ", args["current"])
-            T.setCurrent(args["channel"], args["current"])
-
         if args["safeC"]:
             if VERB:
                 print("Setting safe current to ", args["safeC"])
@@ -92,6 +82,16 @@ def main():
             if VERB:
                 print("Setting safe voltage to ", args["safeV"])
             T.setSafeCurrent(args["safeV"])
+
+        if args["voltage"]:
+            if VERB:
+                print("Setting voltage to ", args["voltage"])
+            T.setVoltage(args["channel"], args["voltage"])
+
+        if args["current"]:
+            if VERB:
+                print("Setting current to ", args["current"])
+            T.setCurrent(args["channel"], args["current"])
 
         if args["save"]:
             if VERB:
