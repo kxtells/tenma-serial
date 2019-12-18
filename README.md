@@ -17,15 +17,18 @@ Coming back from holidays was hard. So I spent some time with a little game (ton
 
 ## Requirements
 
-Python and the serial library:
+Python and the serial and click libraries:
 
 	pip install pyserial
+	pip install click
 
 Shortcomings:
 
  * Cannot read current consumption. (Function implemented, does not seem to work)
  * Always saves to memory 1. (Function implemented, POWER SUPPLY not behaving as expected. Restores all memories correctly though.
  * The physical buttons are blocked for a while after connecting.
+ * The safeON method does not select channels.
+ * The safe current and voltage values are hardcoded in Tenma72_2540 class. To use different values, either overwrite them in tenmaDcLib.py, or use safeC and safeV cli args.
 
 
 ## Usage examples
@@ -66,3 +69,11 @@ For example: 2.2 Amperes 5V:
 A very simple GTK indicator to control a tenma DC power supply from a graphical desktop. Provides ON, OFF and RESET facilities. Simply start it with:
 
 	./gtkIndicator.py
+
+### Safely turn on while checking current (3A) and voltage (12V) before turning on
+
+    python tenmaControl.py --safeOn /dev/ttyUSB0
+
+### Safely turn on while checking custom current (safeC=2000 mA) and voltage (safeV=5000 mV) before turning on
+
+    python tenmaControl.py --safeOn --safeC 2000 --safeV 5000 /dev/ttyUSB0

@@ -27,6 +27,8 @@ def main():
     parser.add_argument('device', default="/dev/ttyUSB0")
     parser.add_argument('-v', '--voltage', help='set mV', required=False, type=int)
     parser.add_argument('-c', '--current', help='set mA', required=False, type=int)
+    parser.add_argument('--safeC', help='set safety current limit to mA', required=False, type=int)
+    parser.add_argument('--safeV', help='set safety voltage limit to mV', required=False, type=int)
     parser.add_argument('-C', '--channel', help='channel to set (if not provided, 1 will be used)', required=False, type=int, default=1)
     parser.add_argument('-s', '--save', help='Save current configuration to Memory', required=False, type=int)
     parser.add_argument('-r', '--recall', help='Load configuration from Memory', required=False, type=int)
@@ -36,6 +38,7 @@ def main():
     parser.add_argument('--ovp-enable', help='Enable overvoltage protection', required=False, action="store_true", default=False)
     parser.add_argument('--ovp-disable', help='Disable overvoltage pritection', required=False, action="store_true", default=False)
     parser.add_argument('--on', help='Set output to ON', action="store_true", default=False)
+    parser.add_argument('--safeOn', help='Safely set output to ON', action="store_true", default=False)
     parser.add_argument('--off', help='Set output to OFF', action="store_true", default=False)
     parser.add_argument('--verbose', help='Chatty program', action="store_true", default=False)
     parser.add_argument('--debug', help='print serial commands', action="store_true", default=False)
@@ -70,6 +73,16 @@ def main():
                 print("Disable overvoltage protection")
             T.setOVP(False)
 
+        if args["safeC"]:
+            if VERB:
+                print("Setting safe current to ", args["safeC"])
+            T.setSafeCurrent(args["safeC"])
+
+        if args["safeV"]:
+            if VERB:
+                print("Setting safe voltage to ", args["safeV"])
+            T.setSafeCurrent(args["safeV"])
+
         if args["voltage"]:
             if VERB:
                 print("Setting voltage to ", args["voltage"])
@@ -102,6 +115,11 @@ def main():
             if VERB:
                 print("Turning OUTPUT OFF")
             T.OFF()
+
+        if args["safeOn"]:
+            if VERB:
+                print("Safely turning OUTPUT ON")
+            T.safeON()
 
         if args["on"]:
             if VERB:
