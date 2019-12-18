@@ -36,6 +36,7 @@ def main():
     parser.add_argument('--ovp-enable', help='Enable overvoltage protection', required=False, action="store_true", default=False)
     parser.add_argument('--ovp-disable', help='Disable overvoltage pritection', required=False, action="store_true", default=False)
     parser.add_argument('--on', help='Set output to ON', action="store_true", default=False)
+    parser.add_argument('--safeOn', help='Safely set output to ON', action="store_true", default=False)
     parser.add_argument('--off', help='Set output to OFF', action="store_true", default=False)
     parser.add_argument('--verbose', help='Chatty program', action="store_true", default=False)
     parser.add_argument('--debug', help='print serial commands', action="store_true", default=False)
@@ -102,6 +103,11 @@ def main():
             if VERB:
                 print("Turning OUTPUT OFF")
             T.OFF()
+
+        if args["safeOn"]:
+            if VERB:
+                print("Safely turning OUTPUT ON")
+            T.safeON()
 
         if args["on"]:
             if VERB:

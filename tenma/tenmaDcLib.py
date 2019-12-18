@@ -19,6 +19,7 @@
 
 import serial
 import time
+import click
 
 
 class TenmaException(Exception):
@@ -40,6 +41,8 @@ class Tenma72_2540:
         self.NCONFS = 5
         self.MAX_MA = 5000
         self.MAX_MV = 30000
+        self.SAFE_MA = 3000
+        self.SAFE_MV = 12000
         self.DEBUG = debug
 
     def setPort(self, serialPort):
@@ -136,6 +139,14 @@ class Tenma72_2540:
         self.__sendCommand(commandCheck)
         return float(self.__readOutput())
 
+    def checkCurrent(self, channel, mA):
+        readcurrent = self.readCurrent(channel)
+
+        if readcurrent * 1000 > mA:
+            return False, readcurrent
+
+        return True, readcurrent
+
     def setCurrent(self, channel, mA):
         if channel > self.NCHANNELS:
             raise TenmaException("Trying to set CH{channel} with only {nch} channels".format(
@@ -150,12 +161,22 @@ class Tenma72_2540:
                 max=self.MAX_MA
             ))
 
+        if mA > self.SAFE_MA:
+            print("Current value ({mA} mA) is above safe limit ({safe_mA} mA).".format(
+                mA=mA,
+                safe_mA=self.SAFE_MA
+            ))
+            if not click.confirm('Do you want to continue?', default=True):
+                print("Aborting.")
+                return
+
         command = "ISET{channel}:{amperes:.3f}"
 
         A = float(mA) / 1000.0
         command = command.format(channel=1, amperes=A)
 
         self.__sendCommand(command)
+
         readcurrent = self.readCurrent(channel)
 
         if readcurrent * 1000 != mA:
@@ -175,6 +196,14 @@ class Tenma72_2540:
         self.__sendCommand(commandCheck)
         return float(self.__readOutput())
 
+    def checkVoltage(self, channel, mV):
+        readvolt = self.readVoltage(channel)
+
+        if readvolt * 1000 > mV:
+            return False, readvolt
+
+        return True, readvolt
+
     def setVoltage(self, channel, mV):
         if channel > self.NCHANNELS:
             raise TenmaException("Trying to set CH{channel} with only {nch} channels".format(
@@ -189,12 +218,22 @@ class Tenma72_2540:
                 max=self.MAX_MV
             ))
 
+        if mV > self.SAFE_MV:
+            print("Voltage value ({mV} mV) is above safe limit ({safe_mV} mV).".format(
+                mV=mV,
+                safe_mV=self.SAFE_MV
+            ))
+            if not click.confirm('Do you want to continue?', default=True):
+                print("Aborting.")
+                return
+
         command = "VSET{channel}:{volt:.2f}"
 
         V = float(mV) / 1000.0
         command = command.format(channel=1, volt=V)
 
         self.__sendCommand(command)
+
         readvolt = self.readVoltage(channel)
 
         if readvolt * 1000 != mV:
@@ -328,6 +367,37 @@ class Tenma72_2540:
         """
             Turns on the output
         """
+
+        command = "OUT1"
+        self.__sendCommand(command)
+
+    def safeON(self):
+        """
+            Safely turns on the output
+        """
+
+        # ToDo: allow channels other than "1"
+        safeCurrent, readcurrent = self.checkCurrent(1, self.SAFE_MA)
+
+        if not safeCurrent:
+            print("Current ({readcurrent} mA) is set above safe limit ({safe_mA} mA).".format(
+                readcurrent=int(readcurrent*1000),
+                safe_mA=self.SAFE_MA
+            ))
+            if not click.confirm('Do you want to continue?', default=True):
+                print("Aborting.")
+                return
+
+        # ToDo: allow channels other than "1"
+        safeVoltage, readvolt = self.checkVoltage(1, self.SAFE_MV)
+        if not safeVoltage:
+            print("Voltage ({readvolt} mV) is set above safe limit ({safe_mV} mV).".format(
+                readvolt=int(readvolt*1000),
+                safe_mV=self.SAFE_MV
+            ))
+            if not click.confirm('Do you want to continue?', default=True):
+                print("Aborting.")
+                return
 
         command = "OUT1"
         self.__sendCommand(command)
