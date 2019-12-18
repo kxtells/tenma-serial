@@ -172,7 +172,7 @@ class Tenma72_2540:
                 mA=mA,
                 safe_mA=self.SAFE_MA
             ))
-            if not click.confirm('Do you want to continue?', default=True):
+            if not click.confirm('Do you want to continue?', default=False):
                 print("Aborting. If you want, use --safeC to allow for a different safe current.")
                 return
 
@@ -229,7 +229,7 @@ class Tenma72_2540:
                 mV=mV,
                 safe_mV=self.SAFE_MV
             ))
-            if not click.confirm('Do you want to continue?', default=True):
+            if not click.confirm('Do you want to continue?', default=False):
                 print("Aborting. If you want, use --safeV to allow for a different safe Voltage.")
                 return
 
@@ -390,7 +390,7 @@ class Tenma72_2540:
                 readcurrent=int(readcurrent*1000),
                 safe_mA=self.SAFE_MA
             ))
-            if not click.confirm('Do you want to continue?', default=True):
+            if not click.confirm('Do you want to continue?', default=False):
                 print("Aborting. Either use --current to set a new output current or use --safeC to allow for a different safe current")
                 return
 
@@ -401,7 +401,7 @@ class Tenma72_2540:
                 readvolt=int(readvolt*1000),
                 safe_mV=self.SAFE_MV
             ))
-            if not click.confirm('Do you want to continue?', default=True):
+            if not click.confirm('Do you want to continue?', default=False):
                 print("Aborting. Either use --voltage to set a new output voltage or use --safeV to allow for a different safe voltage")
                 return
 
