@@ -15,13 +15,19 @@ Coming back from holidays was hard. So I spent some time with a little game (ton
 
 [https://jcastellssala.com/2017/10/31/tenma72-2540-linux-control/](https://jcastellssala.com/2017/10/31/tenma72-2540-linux-control/)
 
+## Installing
+
+via pip:
+
+    pip install tenma-serial
+
 ## Requirements
 
-Python and the serial library:
+If just cloning and running install the required packages first.
 
-	pip install pyserial
+	pip install -r requirements.txt
 
-Shortcomings:
+## Shortcomings:
 
  * Cannot read current consumption. (Function implemented, does not seem to work)
  * Always saves to memory 1. (Function implemented, POWER SUPPLY not behaving as expected. Restores all memories correctly though.
