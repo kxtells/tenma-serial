@@ -1,7 +1,16 @@
 """
-    tenmaDcLib is small python library to control a Tenma 72-2540 programmable
-    DC power supply
+    tenmaDcLib is small python library to control a Tenma 72-XXXX programmable
+    DC power supply, either from USB or Serial.
     Copyright (C) 2017 Jordi Castells
+
+    Supported models:
+    72_2545 -> tested on HW
+    72_2535 -> Set as manufacturer manual (not tested)
+    72_2540 -> Set as manufacturer manual (not tested)
+    72_2550 -> Set as manufacturer manual (not tested)
+    72_2930 -> Set as manufacturer manual (not tested)
+    72_2940 -> Set as manufacturer manual (not tested)
+
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -25,21 +34,30 @@ class TenmaException(Exception):
     pass
 
 
-class Tenma72_2540:
+
+class Tenma72Base:
     """
-        Control a tenma 72-2540 DC power supply
+        Control a tenma 72-XXXX DC power supply
+
+        Defaults in this class assume a 72-2540, use
+        subclasses for other models
     """
+    MATCH_STR = ''
+
+    # 72Base sets some defaults. Subclasses should define
+    # custom limits
+    NCHANNELS = 1
+    NCONFS = 5
+    MAX_MA = 5000
+    MAX_MV = 30000
+
+
     def __init__(self, serialPort, debug=False):
         self.ser = serial.Serial(port=serialPort,
                                  baudrate=9600,
                                  parity=serial.PARITY_NONE,
                                  stopbits=serial.STOPBITS_ONE)
 
-        self.NCHANNELS = 1
-        # Only 4 physical buttons. But 5 memories are available
-        self.NCONFS = 5
-        self.MAX_MA = 5000
-        self.MAX_MV = 30000
         self.DEBUG = debug
 
     def setPort(self, serialPort):
@@ -53,7 +71,7 @@ class Tenma72_2540:
             print(">> ", command)
         self.ser.write(command.encode('ascii'))
         # Give it time to process
-        time.sleep(0.5)
+        time.sleep(0.2)
 
     def __readBytes(self):
         """
@@ -342,3 +360,50 @@ class Tenma72_2540:
 
     def close(self):
         self.ser.close()
+
+class Tenma72_2540(Tenma72Base):
+    """
+        Base Class, tested on real HW unit
+    """
+    MATCH_STR = '72-2540'
+    NCHANNELS = 1
+    # Only 4 physical buttons. But 5 memories are available
+    NCONFS = 5
+    MAX_MA = 5000
+    MAX_MV = 30000
+
+
+class Tenma72_2535(Tenma72Base):
+    MATCH_STR = '72-2535'
+    NCHANNELS = 1
+    NCONFS = 5
+    MAX_MA = 3000
+    MAX_MV = 30000
+
+class Tenma72_2545(Tenma72Base):
+    MATCH_STR = '72-2545'
+    NCHANNELS = 1
+    NCONFS = 5
+    MAX_MA = 2000
+    MAX_MV = 60000
+
+class Tenma72_2550(Tenma72Base):
+    MATCH_STR = '72-2550'
+    NCHANNELS = 1
+    NCONFS = 5
+    MAX_MA = 3000
+    MAX_MV = 60000
+
+class Tenma72_2930(Tenma72Base):
+    MATCH_STR = '72-2930'
+    NCHANNELS = 1
+    NCONFS = 5
+    MAX_MA = 10000
+    MAX_MV = 30000
+
+class Tenma72_2940(Tenma72Base):
+    MATCH_STR = '72-2940'
+    NCHANNELS = 1
+    NCONFS = 5
+    MAX_MA = 5000
+    MAX_MV = 60000
