@@ -35,7 +35,11 @@ from gi.repository import Gtk as gtk
 from gi.repository import AppIndicator3 as appindicator
 from gi.repository import Notify as notify
 
-from tenmaDcLib import *
+try:
+    from tenma.tenmaDcLib import instantiate_tenma_class_from_device_response, TenmaException
+except:
+    from tenmaDcLib import instantiate_tenma_class_from_device_response, TenmaException
+
 
 
 APPINDICATOR_ID = 'Tenma DC Power'
@@ -85,7 +89,7 @@ class gtkController():
 
         try:
             if not self.T:
-                self.T = Tenma72_2540(self.serialPort)
+                self.T = instantiate_tenma_class_from_device_response(self.serialPort)
             else:
                 self.T.setPort(self.serialPort)
         except Exception as e:
