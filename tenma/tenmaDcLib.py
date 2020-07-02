@@ -356,6 +356,20 @@ class Tenma72Base(object):
         command = "OVP{conf}".format(conf=conf)
         self.__sendCommand(command)
 
+    def setBEEP(self, enable=True):
+        """
+            Enable or disable BEEP
+
+            There's no feedback from the serial connection to determine
+            whether BEEP was set or not.
+
+            :param enable: Boolean to enable or disable
+        """
+        conf = 1 if enable else 0
+        command = "BEEP{conf}".format(conf=conf)
+        self.__sendCommand(command)
+
+
     def ON(self):
         """
             Turns on the output

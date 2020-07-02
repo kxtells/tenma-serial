@@ -31,10 +31,12 @@ def main():
     parser.add_argument('-s', '--save', help='Save current configuration to Memory', required=False, type=int)
     parser.add_argument('-r', '--recall', help='Load configuration from Memory', required=False, type=int)
     parser.add_argument('-S', '--status', help='Retrieve and print system status', required=False, action="store_true", default=False)
-    parser.add_argument('--ocp-enable', help='Enable overcurrent protection', required=False, action="store_true", default=False)
-    parser.add_argument('--ocp-disable', help='Disable overcurrent pritection', required=False, action="store_true", default=False)
-    parser.add_argument('--ovp-enable', help='Enable overvoltage protection', required=False, action="store_true", default=False)
-    parser.add_argument('--ovp-disable', help='Disable overvoltage pritection', required=False, action="store_true", default=False)
+    parser.add_argument('--ocp-enable', dest="ocp", help='Enable overcurrent protection', required=False, action="store_true", default=None)
+    parser.add_argument('--ocp-disable',dest="ocp", help='Disable overcurrent pritection', required=False, action="store_false", default=None)
+    parser.add_argument('--ovp-enable', dest="ovp", help='Enable overvoltage protection', required=False, action="store_true", default=None)
+    parser.add_argument('--ovp-disable',dest="ovp",  help='Disable overvoltage pritection', required=False, action="store_false", default=None)
+    parser.add_argument('--beep-enable',dest="beep", help='Enable beeps from unit', required=False, action="store_true", default=None)
+    parser.add_argument('--beep-disable',dest="beep", help='Disable beeps from unit', required=False, action="store_false", default=None)
     parser.add_argument('--on', help='Set output to ON', action="store_true", default=False)
     parser.add_argument('--off', help='Set output to OFF', action="store_true", default=False)
     parser.add_argument('--verbose', help='Chatty program', action="store_true", default=False)
@@ -49,6 +51,7 @@ def main():
         T = instantiate_tenma_class_from_device_response(args["device"], args["debug"])
         if not args["script"]:
             print("VERSION: ", T.getVersion())
+        print(args)
 
         # On saving, we want to move to the proper memory 1st, then
         # perform the current/voltage/options setting
@@ -61,25 +64,32 @@ def main():
             T.recallConf(args["save"])
 
         # Now, with memory, or no memory handling, perform the changes
-        if args["ocp_enable"]:
+        if args["ocp"] is not None:
             if VERB:
-                print("Enable overcurrent protection")
-            T.setOCP(True)
+                if args["ocp"]:
+                    print("Enable overcurrent protection")
+                else:
+                    print("Disable overcurrent protection")
 
-        if args["ocp_disable"]:
-            if VERB:
-                print("Disable overcurrent protection")
-            T.setOCP(False)
+            T.setOCP(args["ocp"])
 
-        if args["ovp_enable"]:
+        if args["ovp"] is not None:
             if VERB:
-                print("Enable overvoltage protection")
-            T.setOVP(True)
+                if args["ovp"]:
+                    print("Enable overvoltage protection")
+                else:
+                    print("Disable overvoltage protection")
 
-        if args["ovp_disable"]:
+            T.setOVP(args["ovp"])
+
+        if args["beep"] is not None:
             if VERB:
-                print("Disable overvoltage protection")
-            T.setOVP(False)
+                if args["beep"]:
+                    print("Enable unit beep")
+                else:
+                    print("Disable unit beep")
+
+            T.setBEEP(args["beep"])
 
         if args["voltage"]:
             if VERB:
