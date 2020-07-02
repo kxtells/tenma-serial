@@ -46,6 +46,7 @@ def main():
     parser.add_argument('--actualVoltage', help='returns the actual voltage reading', action="store_true", default=False)
     args = vars(parser.parse_args())
 
+    T = None
     try:
         VERB = args["verbose"]
         T = instantiate_tenma_class_from_device_response(args["device"], args["debug"])
@@ -148,7 +149,8 @@ def main():
     finally:
         if VERB:
             print("Closing connection")
-        T.close()
+        if T:
+            T.close()
 
 if __name__ == "__main__":
     main()
