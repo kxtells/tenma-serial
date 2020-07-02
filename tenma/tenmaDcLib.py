@@ -269,7 +269,7 @@ class Tenma72_2540:
         volt = self.readVoltage(channel)
         curr = self.readCurrent(channel)
 
-        # Load conf
+        # Load conf (ensure we're on a the proper conf)
         self.recallConf(conf)
 
         # Load the new conf in the panel

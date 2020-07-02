@@ -50,6 +50,17 @@ def main():
         if not args["script"]:
             print("VERSION: ", T.getVersion())
 
+        # On saving, we want to move to the proper memory 1st, then
+        # perform the current/voltage/options setting
+        # and after that, perform the save
+        if args["save"]:
+            if VERB:
+                print("Recalling Memory", args["save"])
+
+            T.OFF() # Turn off for safety
+            T.recallConf(args["save"])
+
+        # Now, with memory, or no memory handling, perform the changes
         if args["ocp_enable"]:
             if VERB:
                 print("Enable overcurrent protection")
