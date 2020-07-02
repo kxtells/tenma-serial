@@ -229,7 +229,7 @@ class Tenma72Base(object):
         self.__sendCommand(command)
         readvolt = self.readVoltage(channel)
 
-        if readvolt * 1000 != mV:
+        if int(readvolt * 1000) != int(mV):
             raise TenmaException("Set {set}mV, but read {read}mV".format(
                 set=mV,
                 read=readvolt * 1000,
@@ -237,7 +237,7 @@ class Tenma72Base(object):
 
     def runningCurrent(self, channel):
         """
-            This does not seem to work
+            Returns the current read of a running channel
         """
         if channel > self.NCHANNELS:
             raise TenmaException("Trying to read CH{channel} with only {nch} channels".format(
@@ -252,7 +252,7 @@ class Tenma72Base(object):
 
     def runningVoltage(self, channel):
         """
-            This does not seem to work
+            Returns the voltage read of a running channel
         """
         if channel > self.NCHANNELS:
             raise TenmaException("Trying to read CH{channel} with only {nch} channels".format(

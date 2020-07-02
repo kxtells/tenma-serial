@@ -42,8 +42,8 @@ def main():
     parser.add_argument('--verbose', help='Chatty program', action="store_true", default=False)
     parser.add_argument('--debug', help='print serial commands', action="store_true", default=False)
     parser.add_argument('--script', help='runs from script. Only print result of query, no version', action="store_true", default=False)
-    parser.add_argument('--actualCurrent', help='returns the actual current reading', action="store_true", default=False)
-    parser.add_argument('--actualVoltage', help='returns the actual voltage reading', action="store_true", default=False)
+    parser.add_argument('--runningCurrent', help='returns the running output current', action="store_true", default=False)
+    parser.add_argument('--runningVoltage', help='returns the running output voltage', action="store_true", default=False)
     args = vars(parser.parse_args())
 
     T = None
@@ -134,14 +134,14 @@ def main():
                 print("Retrieving status")
             print(T.getStatus())
 
-        if args["actualCurrent"]:
+        if args["runningCurrent"]:
             if VERB:
-                print("Retrieving actual Current")
+                print("Retrieving running Current")
             print(T.runningCurrent(args["channel"]))
 
-        if args["actualVoltage"]:
+        if args["runningVoltage"]:
             if VERB:
-                print("Retrieving actual Voltage")
+                print("Retrieving running Voltage")
             print(T.runningVoltage(args["channel"]))
 
     except TenmaException as e:

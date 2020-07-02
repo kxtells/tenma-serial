@@ -82,7 +82,4 @@ A very simple GTK indicator to control a tenma DC power supply from a graphical 
 	./gtkIndicator.py
 
 # Known Shortcomings:
-
- * Cannot read current consumption. (Function implemented, does not seem to work)
  * The physical buttons are blocked for a while after connecting.
-
