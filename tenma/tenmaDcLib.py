@@ -190,7 +190,7 @@ class Tenma72Base(object):
         self.__sendCommand(command)
         readcurrent = self.readCurrent(channel)
 
-        if readcurrent * 1000 != mA:
+        if int(readcurrent * 1000) != mA:
             raise TenmaException("Set {set}mA, but read {read}mA".format(
                 set=mA,
                 read=readcurrent * 1000,
