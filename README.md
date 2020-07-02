@@ -1,6 +1,6 @@
 # Tenma DC power supply controllers
 
-Provides two basic controllers (tested on Linux) for a TENMA DC power supply via serial interface.
+Provides two basic controllers (tested on Linux) for a TENMA DC power supply via serial interface. Working on python 2.7 and python 3.
 
  * tenmaControl (command line utility)
  * gtkIndicator (GTK indicator to sit on tray)
@@ -46,34 +46,34 @@ _, running _dmesg_ to get where the /dev/ttyACMX device registerd and pointing t
 
 ### Print the Tenma version
 
-	python tenmaControl.py /dev/ttyUSB0
+	tenmaControl.py /dev/ttyUSB0
 
 ### Set the current and the voltage
 
 For example: 2.2 Amperes 5V:
 
-	python tenmaControl.py -c 2200 -v 5000 /dev/ttyUSB0
+	tenmaControl.py -c 2200 -v 5000 /dev/ttyUSB0
 
 ### Turn on the channel output
 
-	python tenmaControl.py --on /dev/ttyUSB0
+	tenmaControl.py --on /dev/ttyUSB0
 
 ### Turn OFF the channel output
 
-	python tenmaControl.py --off /dev/ttyUSB0
+	tenmaControl.py --off /dev/ttyUSB0
 
 ### Load an existing memory
 
-	python tenmaControl.py -r 1
-	python tenmaControl.py --recall 2
+	tenmaControl.py -r 1
+	tenmaControl.py --recall 2
 
 ### Create a new value for a memory 4
 
-	python tenmaControl.py -c 2200 -v 5000 --save 4 /dev/ttyUSB0
+	tenmaControl.py -c 2200 -v 5000 --save 4 /dev/ttyUSB0
 
 ### Print everything
 
-	python tenmaControl.py -c 2200 -v 5000 --save 4 --verbose --debug /dev/ttyUSB0
+	tenmaControl.py -c 2200 -v 5000 --save 4 --verbose --debug /dev/ttyUSB0
 
 # gtkIndicator
 

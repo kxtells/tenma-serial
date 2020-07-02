@@ -19,7 +19,12 @@
 
 import argparse
 
-from tenmaDcLib import instantiate_tenma_class_from_device_response, TenmaException
+# TODO this is just a trick so tenmaControl runs cleanly from both the source tree
+# and the pip installation
+try:
+    from tenma.tenmaDcLib import instantiate_tenma_class_from_device_response, TenmaException
+except:
+    from tenmaDcLib import instantiate_tenma_class_from_device_response, TenmaException
 
 
 def main():
