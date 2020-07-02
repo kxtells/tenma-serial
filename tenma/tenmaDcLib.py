@@ -34,10 +34,24 @@ class TenmaException(Exception):
     pass
 
 
-
-class Tenma72Base:
+def instantiate_tenma_class_from_device_response(device, debug=False):
     """
-        Control a tenma 72-XXXX DC power supply
+        Asks to the serial interface the version command
+    """
+    # Fist instantiate base to retrieve version
+    T = Tenma72Base(device, debug=debug)
+    ver = T.getVersion()
+
+    for cls in Tenma72Base.__subclasses__():
+        if cls.MATCH_STR in ver:
+            return cls(device, debug)
+
+    print("Could not detect Tenma Model, assuming 72_2545")
+    return Tenma72_2545(device, debug)
+
+class Tenma72Base(object):
+    """
+        Control a tenma 72-XXXX DC bench power supply
 
         Defaults in this class assume a 72-2540, use
         subclasses for other models

@@ -1,5 +1,5 @@
 """
-    Command line tenma control program for Tenma72_2540
+    Command line tenma control program for Tenma72_XXXX bank power supply
     Copyright (C) 2017 Jordi Castells
 
     This program is free software: you can redistribute it and/or modify
@@ -19,7 +19,7 @@
 
 import argparse
 
-from tenmaDcLib import *
+from tenmaDcLib import instantiate_tenma_class_from_device_response, TenmaException
 
 
 def main():
@@ -46,7 +46,7 @@ def main():
 
     try:
         VERB = args["verbose"]
-        T = Tenma72_2540(args["device"], debug=args["debug"])
+        T = instantiate_tenma_class_from_device_response(args["device"], args["debug"])
         if not args["script"]:
             print("VERSION: ", T.getVersion())
 
