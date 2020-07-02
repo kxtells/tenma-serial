@@ -9,32 +9,39 @@ Provides two basic controllers (tested on Linux) for a TENMA DC power supply via
 
 ## What is this?
 
-A small command line program / library to setup a Tenma 72-2540 DC POWER SUPPLY from your computer via SERIAL.
+A small command line program / library to setup a Tenma 72-XXXX DC POWER SUPPLY from your computer via SERIAL. 
 
-Coming back from holidays was hard. So I spent some time with a little game (tongue). You'll find a small explanation of the code in:
+Supports the following models with predefined limits:
+    * 72-2545 -> tested on HW
+    * 72-2535 -> Set as manufacturer manual (not tested)
+    * 72-2540 -> Set as manufacturer manual (not tested)
+    * 72-2550 -> Set as manufacturer manual (not tested)
+    * 72-2930 -> Set as manufacturer manual (not tested)
+    * 72-2940 -> Set as manufacturer manual (not tested)
+
+Also, even if not described, should support [Koradka models](https://sigrok.org/wiki/Korad_KAxxxxP_series) and other Velleman units which are just rebrandings of the same internals.
+
+Originally, Coming back from holidays was hard. So I spent some time with a little game (tongue). You'll find a small explanation of the code in:
 
 [https://jcastellssala.com/2017/10/31/tenma72-2540-linux-control/](https://jcastellssala.com/2017/10/31/tenma72-2540-linux-control/)
 
 ## Installing
 
-via pip:
+### From pip
 
     pip install tenma-serial
 
-## Requirements
+### Locally
 
-If just cloning and running install the required packages first.
+It does not have many requirements, so you might just clone the repo and run it. install the required packages first.
 
 	pip install -r requirements.txt
 
-## Shortcomings:
-
- * Cannot read current consumption. (Function implemented, does not seem to work)
- * Always saves to memory 1. (Function implemented, POWER SUPPLY not behaving as expected. Restores all memories correctly though.
- * The physical buttons are blocked for a while after connecting.
-
 
 ## Usage examples
+
+Note that it can be connected via a usb to serial cable, or directly with the provided USB cable. In Linux it identifies the usb as _Bus 001 Device 015: ID 0416:5011 Winbond Electronics Corp. Virtual Com Port
+_, running _dmesg_ to get where the /dev/ttyACMX device registerd and pointing tenmaControl.py to that device should work.
 
 ### Print the Tenma version
 
@@ -72,3 +79,9 @@ For example: 2.2 Amperes 5V:
 A very simple GTK indicator to control a tenma DC power supply from a graphical desktop. Provides ON, OFF and RESET facilities. Simply start it with:
 
 	./gtkIndicator.py
+
+# Known Shortcomings:
+
+ * Cannot read current consumption. (Function implemented, does not seem to work)
+ * The physical buttons are blocked for a while after connecting.
+

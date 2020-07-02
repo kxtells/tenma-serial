@@ -51,7 +51,6 @@ def main():
         T = instantiate_tenma_class_from_device_response(args["device"], args["debug"])
         if not args["script"]:
             print("VERSION: ", T.getVersion())
-        print(args)
 
         # On saving, we want to move to the proper memory 1st, then
         # perform the current/voltage/options setting
