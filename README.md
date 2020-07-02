@@ -12,6 +12,7 @@ Provides two basic controllers (tested on Linux) for a TENMA DC power supply via
 A small command line program / library to setup a Tenma 72-XXXX DC POWER SUPPLY from your computer via SERIAL. 
 
 Supports the following models with predefined limits:
+
     * 72-2545 -> tested on HW
     * 72-2535 -> Set as manufacturer manual (not tested)
     * 72-2540 -> Set as manufacturer manual (not tested)
