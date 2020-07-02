@@ -2,8 +2,8 @@
 
 Provides two basic controllers (tested on Linux) for a TENMA DC power supply via serial interface. Working on python 2.7 and python 3.
 
- * tenmaControl (command line utility)
- * gtkIndicator (GTK indicator to sit on tray)
+ * tenmaControl.py (tenma-control) (command line utility)
+ * gtkIndicator.py (tenma-applet) (GTK indicator to sit on tray)
 
 # tenmaControl
 
@@ -32,6 +32,8 @@ Originally, Coming back from holidays was hard. So I spent some time with a litt
 
     pip install tenma-serial
 
+pip install will leave `tenma-control` and `tenma-applet` in your PATH ready to use.
+
 ### Locally
 
 It does not have many requirements, so you might just clone the repo and run it. install the required packages first.
@@ -41,8 +43,10 @@ It does not have many requirements, so you might just clone the repo and run it.
 
 ## Usage examples
 
-Note that it can be connected via a usb to serial cable, or directly with the provided USB cable. In Linux it identifies the usb as _Bus 001 Device 015: ID 0416:5011 Winbond Electronics Corp. Virtual Com Port
-_, running _dmesg_ to get where the /dev/ttyACMX device registerd and pointing tenmaControl.py to that device should work.
+Note that it can be connected via a usb to serial cable, or directly with the provided USB cable. In Linux it identifies the usb as `Bus 001 Device 015: ID 0416:5011 Winbond Electronics Corp. Virtual Com Port
+`, running `dmesg` to get where the /dev/ttyACMX device registerd and pointing tenmaControl.py to that device should work.
+
+any of the following examples can run via `tenma-control` or `tenmaControl.py`.
 
 ### Print the Tenma version
 
@@ -75,9 +79,13 @@ For example: 2.2 Amperes 5V:
 
 	tenmaControl.py -c 2200 -v 5000 --save 4 --verbose --debug /dev/ttyUSB0
 
-# gtkIndicator
+# tenma-applet gtkIndicator
 
 A very simple GTK indicator to control a tenma DC power supply from a graphical desktop. Provides ON, OFF and RESET facilities. Simply start it with:
+
+    tenma-applet
+
+Or directly from the source code via:
 
 	./gtkIndicator.py
 
