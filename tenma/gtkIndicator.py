@@ -79,6 +79,8 @@ class gtkController():
     def __init__(self):
         self.serialPort = "No Port"
         self.serialMenu = None
+        self.memoryMenu = None
+
         self.T = None
         self.itemSet = []
         pass
@@ -110,6 +112,41 @@ class gtkController():
             self.setItemSetStatus(True)
 
         self.item_connectedPort.set_label(self.serialPort)
+        self.item_unit_version.set_label(ver[:20])
+        self.memoryMenu = self.build_memory_submenu(None, self.T.NCONFS)
+
+
+    def memorySelected(self, source):
+        """
+            Select one of the multiple memories
+        """
+        try:
+            memory_index = source.get_label()
+            self.T.OFF()
+            self.T.recallConf(int(memory_index))
+        except Exception as e:
+            notify.Notification.new("<b>ERROR</b>", repr(e),
+                                    gtk.STOCK_DIALOG_ERROR).show()
+
+
+    def build_memory_submenu(self, source, nmemories):
+        """
+            Build a submenu containing a list of INTS
+            with the available memories for the unit
+        """
+        if not self.memoryMenu:
+            self.memoryMenu= gtk.Menu()
+
+        for entry in self.memoryMenu.get_children():
+            self.memoryMenu.remove(entry)
+
+        for m_index in range(1,nmemories+1):
+            menuEntry = gtk.MenuItem(m_index)
+            menuEntry.connect('activate', self.memorySelected)
+            self.memoryMenu.append(menuEntry)
+            menuEntry.show()
+
+        return self.memoryMenu
 
     def build_serial_submenu(self, source):
         """
@@ -147,6 +184,7 @@ class gtkController():
 
     def build_gtk_menu(self):
         serialMenu = self.build_serial_submenu(None)
+        memoryMenu = self.build_memory_submenu(None, 0)
 
         menu = gtk.Menu()
 
@@ -154,11 +192,19 @@ class gtkController():
         self.item_connectedPort.set_right_justified(True)
         self.item_connectedPort.set_sensitive(False)
 
+        self.item_unit_version = gtk.MenuItem("unknown version")
+        self.item_unit_version.set_right_justified(True)
+        self.item_unit_version.set_sensitive(False)
+
+
         item_quit = gtk.MenuItem('Quit')
         item_quit.connect('activate', self.quit)
 
         item_serial_menu = gtk.MenuItem('Serial')
         item_serial_menu.set_submenu(serialMenu)
+
+        item_memory_menu = gtk.MenuItem('Memory')
+        item_memory_menu.set_submenu(memoryMenu)
 
         item_on = gtk.MenuItem('ON')
         item_on.connect('activate', self.tenmaTurnOn)
@@ -170,7 +216,13 @@ class gtkController():
         item_reset.connect('activate', self.tenmaReset)
 
         menu.append(self.item_connectedPort)
+        menu.append(self.item_unit_version)
         menu.append(item_serial_menu)
+
+        sep = gtk.SeparatorMenuItem()
+        menu.append(sep)
+
+        menu.append(item_memory_menu)
 
         sep = gtk.SeparatorMenuItem()
         menu.append(sep)
@@ -186,7 +238,7 @@ class gtkController():
 
         menu.show_all()
 
-        self.itemSet.extend([item_on, item_off, item_reset])
+        self.itemSet.extend([item_on, item_off, item_reset, item_memory_menu])
         self.setItemSetStatus(False)
 
         return menu
