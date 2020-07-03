@@ -1,29 +1,35 @@
+#    Copyright (C) 2017,2019,2020 Jordi Castells
+#
+#
+#   this file is part of tenma-serial
+#   This program is free software: you can redistribute it and/or modify
+#   it under the terms of the GNU General Public License as published by
+#   the Free Software Foundation, either version 3 of the License, or
+#   (at your option) any later version.
+#
+#   This program is distributed in the hope that it will be useful,
+#   but WITHOUT ANY WARRANTY; without even the implied warranty of
+#   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#   GNU General Public License for more details.
+#
+#   You should have received a copy of the GNU General Public License
+#   along with this program.  If not, see <http://www.gnu.org/licenses/>
+
 """
     tenmaDcLib is small python library to control a Tenma 72-XXXX programmable
     DC power supply, either from USB or Serial.
-    Copyright (C) 2017 Jordi Castells
 
     Supported models:
-    72_2545 -> tested on HW
-    72_2535 -> Set as manufacturer manual (not tested)
-    72_2540 -> Set as manufacturer manual (not tested)
-    72_2550 -> Set as manufacturer manual (not tested)
-    72_2930 -> Set as manufacturer manual (not tested)
-    72_2940 -> Set as manufacturer manual (not tested)
 
+     * 72_2545 -> tested on HW
+     * 72_2535 -> Set as manufacturer manual (not tested)
+     * 72_2540 -> Set as manufacturer manual (not tested)
+     * 72_2550 -> Set as manufacturer manual (not tested)
+     * 72_2930 -> Set as manufacturer manual (not tested)
+     * 72_2940 -> Set as manufacturer manual (not tested)
 
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>
+    Other units from Korad or Vellman might work as well since
+    they use the same serial protocol.
 """
 
 import serial
@@ -36,7 +42,11 @@ class TenmaException(Exception):
 
 def instantiate_tenma_class_from_device_response(device, debug=False):
     """
-        Asks to the serial interface the version command
+        Get a proper Tenma subclass depending on the version
+        response from the unit.
+
+        The subclasses mainly deal with the limit checks for each
+        unit.
     """
     # Fist instantiate base to retrieve version
     T = Tenma72Base(device, debug=debug)
@@ -123,6 +133,16 @@ class Tenma72Base(object):
     def getStatus(self):
         """
             Returns the power supply status as a dictionary of values
+
+            * ch1Mode: "C.V | C.C"
+            * ch2Mode: "C.V | C.C"
+            * tracking:
+                * 00=Independent
+                * 01=Tracking series
+                * 11=Tracking parallel
+            * BeepEnabled: True | False
+            * lockEnabled: True | False
+            * outEnabled: True | False
         """
         self.__sendCommand("STATUS?")
         statusBytes = self.__readBytes()
@@ -267,9 +287,10 @@ class Tenma72Base(object):
 
     def saveConf(self, conf):
         """
-            Save current configuration. Does not work as one would expect. SAV(4)
-            will not save directly to memory 4. We actually need to recall memory
-            4, and then save the configuration.
+            Save current configuration into Memory.
+
+            Does not work as one would expect. SAV(4) will not save directly to memory 4.
+            We actually need to recall memory 4, set configuration and then SAV(4)
         """
         if conf > self.NCONFS:
             raise TenmaException("Trying to set M{channel} with only {nch} confs".format(
@@ -287,9 +308,10 @@ class Tenma72Base(object):
             work as advertised, or expected, at least in 72_2540.
 
             This will:
-             - turn off the output
-             - recall memory conf
-             - Save to that memory conf
+             * turn off the output
+             * Read the voltage that is set
+             * recall memory conf
+             * Save to that memory conf
 
             :param conf: Memory index to store to
             :param channel: Channel with output to store
@@ -318,7 +340,7 @@ class Tenma72Base(object):
 
     def recallConf(self, conf):
         """
-            Load existing configuration
+            Load existing configuration in Memory. Same as pressing any Mx button on the unit
         """
 
         if conf > self.NCONFS:
@@ -389,49 +411,81 @@ class Tenma72Base(object):
     def close(self):
         self.ser.close()
 
+#
+#
+# Subclasses defining limits for each unit
+# #\ :  Added for sphinx to pickup and document
+# this constants
+#
+#
 class Tenma72_2540(Tenma72Base):
-    """
-        Base Class, tested on real HW unit
-    """
     MATCH_STR = '72-2540'
+    #:
     NCHANNELS = 1
-    # Only 4 physical buttons. But 5 memories are available
+    #: Only 4 physical buttons. But 5 memories are available
     NCONFS = 5
+    #:
     MAX_MA = 5000
+    #:
     MAX_MV = 30000
 
 
 class Tenma72_2535(Tenma72Base):
+    #:
     MATCH_STR = '72-2535'
+    #:
     NCHANNELS = 1
+    #:
     NCONFS = 5
+    #:
     MAX_MA = 3000
+    #:
     MAX_MV = 30000
 
 class Tenma72_2545(Tenma72Base):
+    #:
     MATCH_STR = '72-2545'
+    #:
     NCHANNELS = 1
+    #:
     NCONFS = 5
+    #:
     MAX_MA = 2000
+    #:
     MAX_MV = 60000
 
 class Tenma72_2550(Tenma72Base):
+    #:
     MATCH_STR = '72-2550'
+    #:
     NCHANNELS = 1
+    #:
     NCONFS = 5
+    #:
     MAX_MA = 3000
+    #:
     MAX_MV = 60000
 
 class Tenma72_2930(Tenma72Base):
+    #:
     MATCH_STR = '72-2930'
+    #:
     NCHANNELS = 1
+    #:
     NCONFS = 5
+    #:
     MAX_MA = 10000
+    #:
     MAX_MV = 30000
 
 class Tenma72_2940(Tenma72Base):
+    #:
     MATCH_STR = '72-2940'
+    #:
     NCHANNELS = 1
+    #:
     NCONFS = 5
+    #:
     MAX_MA = 5000
+    #:
     MAX_MV = 60000
