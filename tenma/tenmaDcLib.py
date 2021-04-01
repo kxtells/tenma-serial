@@ -51,7 +51,8 @@ def instantiate_tenma_class_from_device_response(device, debug=False):
     # Fist instantiate base to retrieve version
     T = Tenma72Base(device, debug=debug)
     ver = T.getVersion()
-
+    T.close()
+    
     for cls in Tenma72Base.__subclasses__():
         if cls.MATCH_STR in ver:
             return cls(device, debug)
