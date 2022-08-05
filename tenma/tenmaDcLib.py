@@ -48,14 +48,19 @@ def instantiate_tenma_class_from_device_response(device, debug=False):
         The subclasses mainly deal with the limit checks for each
         unit.
     """
-    # Fist instantiate base to retrieve version
+    # First instantiate base to retrieve version
     T = Tenma72Base(device, debug=debug)
     ver = T.getVersion()
+    if not ver:
+        print("No version found, retrying with newline EOL")
+        T.SERIAL_EOL = "\n"
+        ver = T.getVersion()
     T.close()
-    
+
     for cls in Tenma72Base.__subclasses__():
-        if cls.MATCH_STR in ver:
-            return cls(device, debug)
+        for match_str in cls.MATCH_STR:
+            if match_str in ver:
+                return cls(device, debug)
 
     print("Could not detect Tenma Model, assuming 72_2545")
     return Tenma72_2545(device, debug)
@@ -67,7 +72,7 @@ class Tenma72Base(object):
         Defaults in this class assume a 72-2540, use
         subclasses for other models
     """
-    MATCH_STR = ''
+    MATCH_STR = ['']
 
     # 72Base sets some defaults. Subclasses should define
     # custom limits
@@ -75,6 +80,7 @@ class Tenma72Base(object):
     NCONFS = 5
     MAX_MA = 5000
     MAX_MV = 30000
+    SERIAL_EOL = ""
 
 
     def __init__(self, serialPort, debug=False):
@@ -94,6 +100,7 @@ class Tenma72Base(object):
     def __sendCommand(self, command):
         if self.DEBUG:
             print(">> ", command)
+        command = command + self.SERIAL_EOL
         self.ser.write(command.encode('ascii'))
         # Give it time to process
         time.sleep(0.2)
@@ -148,9 +155,6 @@ class Tenma72Base(object):
         self.__sendCommand("STATUS?")
         statusBytes = self.__readBytes()
 
-        if len(statusBytes) > 1:
-            raise TenmaException("Received more bytes than expected when reading status")
-
         status = statusBytes[0]
 
         ch1mode = (status & 0x01)
@@ -187,7 +191,7 @@ class Tenma72Base(object):
 
         commandCheck = "ISET{channel}?".format(channel=1)
         self.__sendCommand(commandCheck)
-        return float(self.__readOutput())
+        return float(self.__readOutput()[:5]) # 72-2550 appends sixth byte from *IDN? to current reading due to firmware bug
 
     def setCurrent(self, channel, mA):
         if channel > self.NCHANNELS:
@@ -420,7 +424,7 @@ class Tenma72Base(object):
 #
 #
 class Tenma72_2540(Tenma72Base):
-    MATCH_STR = '72-2540'
+    MATCH_STR = ['72-2540']
     #:
     NCHANNELS = 1
     #: Only 4 physical buttons. But 5 memories are available
@@ -433,7 +437,7 @@ class Tenma72_2540(Tenma72Base):
 
 class Tenma72_2535(Tenma72Base):
     #:
-    MATCH_STR = '72-2535'
+    MATCH_STR = ['72-2535']
     #:
     NCHANNELS = 1
     #:
@@ -445,7 +449,7 @@ class Tenma72_2535(Tenma72Base):
 
 class Tenma72_2545(Tenma72Base):
     #:
-    MATCH_STR = '72-2545'
+    MATCH_STR = ['72-2545']
     #:
     NCHANNELS = 1
     #:
@@ -457,7 +461,7 @@ class Tenma72_2545(Tenma72Base):
 
 class Tenma72_2550(Tenma72Base):
     #:
-    MATCH_STR = '72-2550'
+    MATCH_STR = ['72-2550', 'KORADKA6003P']
     #:
     NCHANNELS = 1
     #:
@@ -469,7 +473,7 @@ class Tenma72_2550(Tenma72Base):
 
 class Tenma72_2930(Tenma72Base):
     #:
-    MATCH_STR = '72-2930'
+    MATCH_STR = ['72-2930']
     #:
     NCHANNELS = 1
     #:
@@ -481,7 +485,7 @@ class Tenma72_2930(Tenma72Base):
 
 class Tenma72_2940(Tenma72Base):
     #:
-    MATCH_STR = '72-2940'
+    MATCH_STR = ['72-2940']
     #:
     NCHANNELS = 1
     #:
@@ -490,3 +494,17 @@ class Tenma72_2940(Tenma72Base):
     MAX_MA = 5000
     #:
     MAX_MV = 60000
+
+class Tenma72_13330(Tenma72Base):
+    #:
+    MATCH_STR = ['72-13330']
+    #:
+    NCHANNELS = 3
+    #:
+    NCONFS = 0
+    #:
+    MAX_MA = 5000
+    #:
+    MAX_MV = 30000
+    #:
+    SERIAL_EOL = "\n"
