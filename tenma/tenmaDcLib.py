@@ -885,7 +885,7 @@ class Tenma72_13330(Tenma72_13320):
     MATCH_STR = ["72-13330"]
     #:
     NCHANNELS = 3
-    #:
+    #: This unit does actually support 10 slots (0-9) but it's not avialable from the front panel
     NCONFS = 0
     #:
     MAX_MA = 5000
