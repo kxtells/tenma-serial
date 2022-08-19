@@ -24,9 +24,11 @@
      * 72_2545 -> tested on HW
      * 72_2535 -> Set as manufacturer manual (not tested)
      * 72_2540 -> Set as manufacturer manual (not tested)
-     * 72_2550 -> Set as manufacturer manual (not tested)
+     * 72_2550 -> Tested on HW
      * 72_2930 -> Set as manufacturer manual (not tested)
      * 72_2940 -> Set as manufacturer manual (not tested)
+     * 72_13320 -> Set as manufacturer manual (not tested)
+     * 72_13330 -> Tested on HW
 
     Other units from Korad or Vellman might work as well since
     they use the same serial protocol.
@@ -67,12 +69,12 @@ def instantiate_tenma_class_from_device_response(device, debug=False):
 
 class Tenma72Base(object):
     """
-        Control a tenma 72-XXXX DC bench power supply
+        Control a Tenma 72-XXXX DC bench power supply
 
         Defaults in this class assume a 72-2540, use
         subclasses for other models
     """
-    MATCH_STR = ['']
+    MATCH_STR = [""]
 
     # 72Base sets some defaults. Subclasses should define
     # custom limits
@@ -91,23 +93,38 @@ class Tenma72Base(object):
 
         self.DEBUG = debug
 
+
     def setPort(self, serialPort):
+        """
+            Sets up the serial port with a new COM/tty device
+
+            :param serialPort: COM/tty device
+        """
         self.ser = serial.Serial(port=serialPort,
                                  baudrate=9600,
                                  parity=serial.PARITY_NONE,
                                  stopbits=serial.STOPBITS_ONE)
 
-    def __sendCommand(self, command):
+
+    def _sendCommand(self, command):
+        """
+            Sends a command to the serial port of a power supply
+
+            :param command: Command to send
+        """
         if self.DEBUG:
-            print(">> ", command)
+            print(">> ", command.strip())
         command = command + self.SERIAL_EOL
-        self.ser.write(command.encode('ascii'))
+        self.ser.write(command.encode("ascii"))
         # Give it time to process
         time.sleep(0.2)
 
-    def __readBytes(self):
+
+    def _readBytes(self):
         """
             Read serial output as a stream of bytes
+
+            :return: Bytes read as a list of integers
         """
         out = []
         while self.ser.inWaiting() > 0:
@@ -118,24 +135,76 @@ class Tenma72Base(object):
 
         return out
 
+
     def __readOutput(self):
         """
             Read serial otput as a string
+
+            :return: Data read as a string
         """
         out = ""
         while self.ser.inWaiting() > 0:
-            out += self.ser.read(1).decode('ascii')
+            out += self.ser.read(1).decode("ascii")
 
         if self.DEBUG:
-            print("<< ", out)
+            print("<< ", out.strip())
 
         return out
 
-    def getVersion(self):
+
+    def checkChannel(self, channel):
+        """
+            Checks that the given channel is valid for the power supply
+
+            :param channel: Channel to check
+            :raises TenmaException: If the channel is outside the range for the power supply
+        """
+        if channel > self.NCHANNELS:
+            raise TenmaException("Channel CH{channel} not in range ({nch} channels supported)".format(
+                channel=channel,
+                nch=self.NCHANNELS
+            ))
+
+
+    def checkVoltage(self, channel, millivolts):
+        """
+            Checks that the given voltage is valid for the power supply
+
+            :param channel: Channel to check
+            :param millivolts: Voltage to check
+            :raises TenmaException: If the voltage is outside the range for the power supply
+        """
+        if millivolts > self.MAX_MV:
+            raise TenmaException("Trying to set CH{channel} voltage to {mv}mV, the maximum is {max}mV".format(
+                channel=channel,
+                mv=millivolts,
+                max=self.MAX_MV
+            ))
+
+
+    def checkCurrent(self, channel, milliamps):
+        """
+            Checks that the given current is valid for the power supply
+
+            :param channel: Channel to check
+            :param milliamps: current to check
+            :raises TenmaException: If the current is outside the range for the power supply
+        """
+        if milliamps > self.MAX_MA:
+            raise TenmaException("Trying to set CH{channel} current to {ma}mA, the maximum is {max}mA".format(
+                channel=channel,
+                ma=milliamps,
+                max=self.MAX_MA
+            ))
+
+    def getVersion(self, serialEol=""):
         """
             Returns a single string with the version of the Tenma Device and Protocol user
+
+            :param serialEol: End of line terminator, defaults to ""
+            :return: The version string from the power supply
         """
-        self.__sendCommand("*IDN?")
+        self._sendCommand("*IDN?{}".format(serialEol))
         return self.__readOutput()
 
     def getStatus(self):
@@ -151,9 +220,11 @@ class Tenma72Base(object):
             * BeepEnabled: True | False
             * lockEnabled: True | False
             * outEnabled: True | False
+
+            :return: Dictionary of status values
         """
-        self.__sendCommand("STATUS?")
-        statusBytes = self.__readBytes()
+        self._sendCommand("STATUS?")
+        statusBytes = self._readBytes()
 
         status = statusBytes[0]
 
@@ -183,112 +254,108 @@ class Tenma72Base(object):
         }
 
     def readCurrent(self, channel):
-        if channel > self.NCHANNELS:
-            raise TenmaException("Trying to read CH{channel} with only {nch} channels".format(
-                channel=channel,
-                nch=self.NCHANNELS
-            ))
+        """
+            Reads the current setting for the given channel
 
-        commandCheck = "ISET{channel}?".format(channel=1)
-        self.__sendCommand(commandCheck)
-        return float(self.__readOutput()[:5]) # 72-2550 appends sixth byte from *IDN? to current reading due to firmware bug
+            :param channel: Channel to read the current of
+            :return: Current for the channel in Amps as a float
+        """
+        self.checkChannel(channel)
+        commandCheck = "ISET{}?".format(channel)
+        self._sendCommand(commandCheck)
+        # 72-2550 appends sixth byte from *IDN? to current reading due to firmware bug
+        return float(self.__readOutput()[:5])
 
-    def setCurrent(self, channel, mA):
-        if channel > self.NCHANNELS:
-            raise TenmaException("Trying to set CH{channel} with only {nch} channels".format(
-                channel=channel,
-                nch=self.NCHANNELS
-            ))
+    def setCurrent(self, channel, milliamps):
+        """
+            Sets the current of the specified channel
 
-        if mA > self.MAX_MA:
-            raise TenmaException("Trying to set CH{channel} to {ma}mA, the maximum is {max}mA".format(
-                channel=channel,
-                ma=mA,
-                max=self.MAX_MA
-            ))
+            :param channel: Channel to set the current of
+            :param milliamps: Current to set the channel to, in mA
+            :raises TenmaException: If the current does not match what was set
+            :return: The current the channel was set to in Amps as a float
+        """
+        self.checkChannel(channel)
+        self.checkCurrent(channel, milliamps)
 
-        command = "ISET{channel}:{amperes:.3f}"
+        A = float(milliamps) / 1000.0
+        command = "ISET{channel}:{amperes:.3f}".format(channel=channel, amperes=A)
 
-        A = float(mA) / 1000.0
-        command = command.format(channel=1, amperes=A)
-
-        self.__sendCommand(command)
+        self._sendCommand(command)
         readcurrent = self.readCurrent(channel)
+        readMilliamps = int(readcurrent * 1000)
 
-        if int(readcurrent * 1000) != mA:
-            raise TenmaException("Set {set}mA, but read {read}mA".format(
-                set=mA,
-                read=readcurrent * 1000,
+        if readMilliamps != milliamps:
+            raise TenmaException("Set {milliamps}mA, but read {readMilliamps}mA".format(
+                milliamps=milliamps,
+                readMilliamps=readMilliamps
             ))
+        return float(readcurrent)
 
     def readVoltage(self, channel):
-        if channel > self.NCHANNELS:
-            raise TenmaException("Trying to read CH{channel} with only {nch} channels".format(
-                channel=channel,
-                nch=self.NCHANNELS
-            ))
+        """
+            Reads the voltage setting for the given channel
 
-        commandCheck = "VSET{channel}?".format(channel=1)
-        self.__sendCommand(commandCheck)
+            :param channel: Channel to read the voltage of
+            :return: Voltage for the channel in Volts as a float
+        """
+        self.checkChannel(channel)
+
+        commandCheck = "VSET{}?".format(channel)
+        self._sendCommand(commandCheck)
         return float(self.__readOutput())
 
-    def setVoltage(self, channel, mV):
-        if channel > self.NCHANNELS:
-            raise TenmaException("Trying to set CH{channel} with only {nch} channels".format(
-                channel=channel,
-                nch=self.NCHANNELS
+    def setVoltage(self, channel, millivolts):
+        """
+            Sets the voltage of the specified channel
+
+            :param channel: Channel to set the voltage of
+            :param millivolts: voltage to set the channel to, in mV
+            :raises TenmaException: If the voltage does not match what was set
+            :return: The voltage the channel was set to in Volts as a float
+        """
+        self.checkChannel(channel)
+        self.checkVoltage(channel, millivolts)
+
+        volts = float(millivolts) / 1000.0
+        command = "VSET{channel}:{volts:.2f}".format(channel=channel, volts=volts)
+
+        self._sendCommand(command)
+        readVolts = self.readVoltage(channel)
+        readMillivolts = int(readVolts * 1000)
+
+        if readMillivolts != int(millivolts):
+            raise TenmaException("Set {millivolts}mV, but read {readMillivolts}mV".format(
+                millivolts=millivolts,
+                readMillivolts=readMillivolts
             ))
-
-        if mV > self.MAX_MV:
-            raise TenmaException("Trying to set CH{channel} to {mv}mV, the maximum is {max}mV".format(
-                channel=channel,
-                mv=mV,
-                max=self.MAX_MV
-            ))
-
-        command = "VSET{channel}:{volt:.2f}"
-
-        V = float(mV) / 1000.0
-        command = command.format(channel=1, volt=V)
-
-        self.__sendCommand(command)
-        readvolt = self.readVoltage(channel)
-
-        if int(readvolt * 1000) != int(mV):
-            raise TenmaException("Set {set}mV, but read {read}mV".format(
-                set=mV,
-                read=readvolt * 1000,
-            ))
+        return float(readVolts)
 
     def runningCurrent(self, channel):
         """
             Returns the current read of a running channel
-        """
-        if channel > self.NCHANNELS:
-            raise TenmaException("Trying to read CH{channel} with only {nch} channels".format(
-                channel=channel,
-                nch=self.NCHANNELS
-            ))
 
-        command = "IOUT{channel}?".format(channel=channel)
-        self.__sendCommand(command)
-        readcurrent = self.__readOutput()
-        return readcurrent
+            :param channel: Channel to get the running current for
+            :return: The running current of the channel in Amps as a float
+        """
+        self.checkChannel(channel)
+
+        command = "IOUT{}?".format(channel)
+        self._sendCommand(command)
+        return float(self.__readOutput())
 
     def runningVoltage(self, channel):
         """
             Returns the voltage read of a running channel
-        """
-        if channel > self.NCHANNELS:
-            raise TenmaException("Trying to read CH{channel} with only {nch} channels".format(
-                channel=channel,
-                nch=self.NCHANNELS
-            ))
 
-        command = "VOUT{channel}?".format(channel=channel)
-        self.__sendCommand(command)
-        readvolt = self.__readOutput()
-        return readvolt
+            :param channel: Channel to get the running voltage for
+            :return: The running voltage of the channel in volts as a float
+        """
+        self.checkChannel(channel)
+
+        command = "VOUT{}?".format(channel)
+        self._sendCommand(command)
+        return float(self.__readOutput())
 
     def saveConf(self, conf):
         """
@@ -296,15 +363,18 @@ class Tenma72Base(object):
 
             Does not work as one would expect. SAV(4) will not save directly to memory 4.
             We actually need to recall memory 4, set configuration and then SAV(4)
+
+            :param conf: Memory index to store to
+            :raises TenmaException: If the memory index is outside the range
         """
         if conf > self.NCONFS:
-            raise TenmaException("Trying to set M{channel} with only {nch} confs".format(
-                channel=conf,
-                nch=self.NCONFS
+            raise TenmaException("Trying to set M{conf} with only {nconf} slots".format(
+                conf=conf,
+                nconf=self.NCONFS
             ))
 
-        command = "SAV{conf}".format(conf=conf)
-        self.__sendCommand(command)
+        command = "SAV{}".format(conf)
+        self._sendCommand(command)
 
     def saveConfFlow(self, conf, channel):
         """
@@ -349,13 +419,11 @@ class Tenma72Base(object):
         """
 
         if conf > self.NCONFS:
-            raise TenmaException("Trying to recall M{channel} with only {nch} confs".format(
-                channel=conf,
-                nch=self.NCONFS
+            raise TenmaException("Trying to recall M{conf} with only {nconf} confs".format(
+                conf=conf,
+                nconf=self.NCONFS
             ))
-
-        command = "RCL{conf}".format(conf=conf)
-        self.__sendCommand(command)
+        self._sendCommand("RCL{}".format(conf))
 
     def setOCP(self, enable=True):
         """
@@ -366,9 +434,10 @@ class Tenma72Base(object):
 
             :param enable: Boolean to enable or disable
         """
-        conf = 1 if enable else 0
-        command = "OCP{conf}".format(conf=conf)
-        self.__sendCommand(command)
+        enableFlag = 1 if enable else 0
+        command = "OCP{}".format(enableFlag)
+        self._sendCommand(command)
+
 
     def setOVP(self, enable=True):
         """
@@ -379,9 +448,10 @@ class Tenma72Base(object):
 
             :param enable: Boolean to enable or disable
         """
-        conf = 1 if enable else 0
-        command = "OVP{conf}".format(conf=conf)
-        self.__sendCommand(command)
+        enableFlag = 1 if enable else 0
+        command = "OVP{}".format(enableFlag)
+        self._sendCommand(command)
+
 
     def setBEEP(self, enable=True):
         """
@@ -392,28 +462,31 @@ class Tenma72Base(object):
 
             :param enable: Boolean to enable or disable
         """
-        conf = 1 if enable else 0
-        command = "BEEP{conf}".format(conf=conf)
-        self.__sendCommand(command)
+        enableFlag = 1 if enable else 0
+        command = "BEEP{}".format(enableFlag)
+        self._sendCommand(command)
 
 
     def ON(self):
         """
             Turns on the output
         """
-
         command = "OUT1"
-        self.__sendCommand(command)
+        self._sendCommand(command)
+
 
     def OFF(self):
         """
-            Turns OFF the output
+            Turns off the output
         """
-
         command = "OUT0"
-        self.__sendCommand(command)
+        self._sendCommand(command)
+
 
     def close(self):
+        """
+            Closes the serial port
+        """
         self.ser.close()
 
 #
@@ -424,7 +497,7 @@ class Tenma72Base(object):
 #
 #
 class Tenma72_2540(Tenma72Base):
-    MATCH_STR = ['72-2540']
+    MATCH_STR = ["72-2540"]
     #:
     NCHANNELS = 1
     #: Only 4 physical buttons. But 5 memories are available
@@ -437,7 +510,7 @@ class Tenma72_2540(Tenma72Base):
 
 class Tenma72_2535(Tenma72Base):
     #:
-    MATCH_STR = ['72-2535']
+    MATCH_STR = ["72-2535"]
     #:
     NCHANNELS = 1
     #:
@@ -449,7 +522,7 @@ class Tenma72_2535(Tenma72Base):
 
 class Tenma72_2545(Tenma72Base):
     #:
-    MATCH_STR = ['72-2545']
+    MATCH_STR = ["72-2545"]
     #:
     NCHANNELS = 1
     #:
@@ -460,8 +533,8 @@ class Tenma72_2545(Tenma72Base):
     MAX_MV = 60000
 
 class Tenma72_2550(Tenma72Base):
-    #:
-    MATCH_STR = ['72-2550', 'KORADKA6003P']
+    #: The 72-2550 we have identifies itself as a Korad KA 6003P internally
+    MATCH_STR = ["72-2550", "KORADKA6003P"]
     #:
     NCHANNELS = 1
     #:
@@ -473,7 +546,7 @@ class Tenma72_2550(Tenma72Base):
 
 class Tenma72_2930(Tenma72Base):
     #:
-    MATCH_STR = ['72-2930']
+    MATCH_STR = ["72-2930"]
     #:
     NCHANNELS = 1
     #:
@@ -483,9 +556,10 @@ class Tenma72_2930(Tenma72Base):
     #:
     MAX_MV = 30000
 
+
 class Tenma72_2940(Tenma72Base):
     #:
-    MATCH_STR = ['72-2940']
+    MATCH_STR = ["72-2940"]
     #:
     NCHANNELS = 1
     #:
