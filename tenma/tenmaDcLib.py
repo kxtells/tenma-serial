@@ -53,14 +53,13 @@ def instantiate_tenma_class_from_device_response(device, debug=False):
     # First instantiate base to retrieve version
     powerSupply = Tenma72Base(device, debug=debug)
     ver = powerSupply.getVersion()
-    if not ver:
+    if not ver and debug:
         print("No version found, retrying with newline EOL")
         ver = powerSupply.getVersion(serialEol="\n")
     powerSupply.close()
 
     for cls in findSubclassesRecursively(Tenma72Base):
         for matchString in cls.MATCH_STR:
-            print(matchString)
             if matchString in ver:
                 return cls(device, debug=debug)
 
