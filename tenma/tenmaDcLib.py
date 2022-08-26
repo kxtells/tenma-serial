@@ -53,8 +53,9 @@ def instantiate_tenma_class_from_device_response(device, debug=False):
     # First instantiate base to retrieve version
     powerSupply = Tenma72Base(device, debug=debug)
     ver = powerSupply.getVersion()
-    if not ver and debug:
-        print("No version found, retrying with newline EOL")
+    if not ver:
+        if debug:
+            print("No version found, retrying with newline EOL")
         ver = powerSupply.getVersion(serialEol="\n")
     powerSupply.close()
 
