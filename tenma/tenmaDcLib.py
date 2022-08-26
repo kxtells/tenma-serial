@@ -176,34 +176,34 @@ class Tenma72Base(object):
             ))
 
 
-    def checkVoltage(self, channel, millivolts):
+    def checkVoltage(self, channel, mV):
         """
             Checks that the given voltage is valid for the power supply
 
             :param channel: Channel to check
-            :param millivolts: Voltage to check
+            :param mV: Voltage to check
             :raises TenmaException: If the voltage is outside the range for the power supply
         """
-        if millivolts > self.MAX_MV:
+        if mV > self.MAX_MV:
             raise TenmaException("Trying to set CH{channel} voltage to {mv}mV, the maximum is {max}mV".format(
                 channel=channel,
-                mv=millivolts,
+                mv=mV,
                 max=self.MAX_MV
             ))
 
 
-    def checkCurrent(self, channel, milliamps):
+    def checkCurrent(self, channel, mA):
         """
             Checks that the given current is valid for the power supply
 
             :param channel: Channel to check
-            :param milliamps: current to check
+            :param mA: current to check
             :raises TenmaException: If the current is outside the range for the power supply
         """
-        if milliamps > self.MAX_MA:
+        if mA > self.MAX_MA:
             raise TenmaException("Trying to set CH{channel} current to {ma}mA, the maximum is {max}mA".format(
                 channel=channel,
-                ma=milliamps,
+                ma=mA,
                 max=self.MAX_MA
             ))
 
@@ -276,28 +276,28 @@ class Tenma72Base(object):
         # 72-2550 appends sixth byte from *IDN? to current reading due to firmware bug
         return float(self.__readOutput()[:5])
 
-    def setCurrent(self, channel, milliamps):
+    def setCurrent(self, channel, mA):
         """
             Sets the current of the specified channel
 
             :param channel: Channel to set the current of
-            :param milliamps: Current to set the channel to, in mA
+            :param mA: Current to set the channel to, in mA
             :raises TenmaException: If the current does not match what was set
             :return: The current the channel was set to in Amps as a float
         """
         self.checkChannel(channel)
-        self.checkCurrent(channel, milliamps)
+        self.checkCurrent(channel, mA)
 
-        A = float(milliamps) / 1000.0
+        A = float(mA) / 1000.0
         command = "ISET{channel}:{amperes:.3f}".format(channel=channel, amperes=A)
 
         self._sendCommand(command)
         readcurrent = self.readCurrent(channel)
         readMilliamps = int(readcurrent * 1000)
 
-        if readMilliamps != milliamps:
-            raise TenmaException("Set {milliamps}mA, but read {readMilliamps}mA".format(
-                milliamps=milliamps,
+        if readMilliamps != mA:
+            raise TenmaException("Set {mA}mA, but read {readMilliamps}mA".format(
+                mA=mA,
                 readMilliamps=readMilliamps
             ))
         return float(readcurrent)
@@ -315,28 +315,28 @@ class Tenma72Base(object):
         self._sendCommand(commandCheck)
         return float(self.__readOutput())
 
-    def setVoltage(self, channel, millivolts):
+    def setVoltage(self, channel, mV):
         """
             Sets the voltage of the specified channel
 
             :param channel: Channel to set the voltage of
-            :param millivolts: voltage to set the channel to, in mV
+            :param mV: voltage to set the channel to, in mV
             :raises TenmaException: If the voltage does not match what was set
             :return: The voltage the channel was set to in Volts as a float
         """
         self.checkChannel(channel)
-        self.checkVoltage(channel, millivolts)
+        self.checkVoltage(channel, mV)
 
-        volts = float(millivolts) / 1000.0
+        volts = float(mV) / 1000.0
         command = "VSET{channel}:{volts:.2f}".format(channel=channel, volts=volts)
 
         self._sendCommand(command)
         readVolts = self.readVoltage(channel)
         readMillivolts = int(readVolts * 1000)
 
-        if readMillivolts != int(millivolts):
-            raise TenmaException("Set {millivolts}mV, but read {readMillivolts}mV".format(
-                millivolts=millivolts,
+        if readMillivolts != int(mV):
+            raise TenmaException("Set {mV}mV, but read {readMillivolts}mV".format(
+                mV=mV,
                 readMillivolts=readMillivolts
             ))
         return float(readVolts)
@@ -661,18 +661,18 @@ class Tenma72_13320(Tenma72Base):
             raise TenmaException("Channel CH3 does not support reading current")
         return super().runningCurrent(channel)
 
-    def setVoltage(self, channel, millivolts):
+    def setVoltage(self, channel, mV):
         """
             Sets the voltage of the specified channel
 
             :param channel: Channel to set the voltage of
-            :param millivolts: voltage to set the channel to, in mV
+            :param mV: voltage to set the channel to, in mV
             :raises TenmaException: If the voltage does not match what was set, or if trying to set an invalid voltage on Channel 3
             :return: The voltage the channel was set to in Volts as a float
         """
-        if channel == 3 and millivolts not in [2500, 3300, 5000]:
+        if channel == 3 and mV not in [2500, 3300, 5000]:
             raise TenmaException("Channel CH3 can only be set to 2500mV, 3300mV or 5000mV")
-        return super().setVoltage(channel, millivolts)
+        return super().setVoltage(channel, mV)
 
     def ON(self, channel=None):
         """
