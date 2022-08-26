@@ -66,7 +66,6 @@ def instantiate_tenma_class_from_device_response(device, debug=False):
     print("Could not detect Tenma power supply model, assuming 72_2545")
     return Tenma72_2545(device, debug=debug)
 
-
 def findSubclassesRecursively(cls):
     """
         Finds all subclasses of a given class recursively
@@ -93,7 +92,6 @@ class Tenma72Base(object):
     MAX_MV = 30000
     SERIAL_EOL = ""
 
-
     def __init__(self, serialPort, debug=False):
         self.ser = serial.Serial(port=serialPort,
                                  baudrate=9600,
@@ -101,7 +99,6 @@ class Tenma72Base(object):
                                  stopbits=serial.STOPBITS_ONE)
 
         self.DEBUG = debug
-
 
     def setPort(self, serialPort):
         """
@@ -113,7 +110,6 @@ class Tenma72Base(object):
                                  baudrate=9600,
                                  parity=serial.PARITY_NONE,
                                  stopbits=serial.STOPBITS_ONE)
-
 
     def _sendCommand(self, command):
         """
@@ -127,7 +123,6 @@ class Tenma72Base(object):
         self.ser.write(command.encode("ascii"))
         # Give it time to process
         time.sleep(0.2)
-
 
     def _readBytes(self):
         """
@@ -144,7 +139,6 @@ class Tenma72Base(object):
 
         return out
 
-
     def __readOutput(self):
         """
             Read serial otput as a string
@@ -160,7 +154,6 @@ class Tenma72Base(object):
 
         return out
 
-
     def checkChannel(self, channel):
         """
             Checks that the given channel is valid for the power supply
@@ -173,7 +166,6 @@ class Tenma72Base(object):
                 channel=channel,
                 nch=self.NCHANNELS
             ))
-
 
     def checkVoltage(self, channel, mV):
         """
@@ -189,7 +181,6 @@ class Tenma72Base(object):
                 mv=mV,
                 max=self.MAX_MV
             ))
-
 
     def checkCurrent(self, channel, mA):
         """
@@ -447,7 +438,6 @@ class Tenma72Base(object):
         command = "OCP{}".format(enableFlag)
         self._sendCommand(command)
 
-
     def setOVP(self, enable=True):
         """
             Enable or disable OVP
@@ -460,7 +450,6 @@ class Tenma72Base(object):
         enableFlag = 1 if enable else 0
         command = "OVP{}".format(enableFlag)
         self._sendCommand(command)
-
 
     def setBEEP(self, enable=True):
         """
@@ -475,7 +464,6 @@ class Tenma72Base(object):
         command = "BEEP{}".format(enableFlag)
         self._sendCommand(command)
 
-
     def ON(self):
         """
             Turns on the output
@@ -483,14 +471,12 @@ class Tenma72Base(object):
         command = "OUT1"
         self._sendCommand(command)
 
-
     def OFF(self):
         """
             Turns off the output
         """
         command = "OUT0"
         self._sendCommand(command)
-
 
     def close(self):
         """
@@ -529,6 +515,7 @@ class Tenma72_2535(Tenma72Base):
     #:
     MAX_MV = 30000
 
+
 class Tenma72_2545(Tenma72Base):
     #:
     MATCH_STR = ["72-2545"]
@@ -541,6 +528,7 @@ class Tenma72_2545(Tenma72Base):
     #:
     MAX_MV = 60000
 
+
 class Tenma72_2550(Tenma72Base):
     #: The 72-2550 we have identifies itself as a Korad KA 6003P internally
     MATCH_STR = ["72-2550", "KORADKA6003P"]
@@ -552,6 +540,7 @@ class Tenma72_2550(Tenma72Base):
     MAX_MA = 3000
     #:
     MAX_MV = 60000
+
 
 class Tenma72_2930(Tenma72Base):
     #:
@@ -577,6 +566,7 @@ class Tenma72_2940(Tenma72Base):
     MAX_MA = 5000
     #:
     MAX_MV = 60000
+
 
 class Tenma72_13320(Tenma72Base):
     #:
