@@ -484,6 +484,132 @@ class Tenma72Base(object):
         """
         self.ser.close()
 
+    def setLock(self, enable=True):
+        """
+            Set the front-panel lock on or off
+
+            :param enable: Enable lock, defaults to True
+            :raises NotImplementedError Not implemented in this base class
+        """
+        raise NotImplementedError("Not supported by all models")
+
+    def setTracking(self, trackingMode):
+        """
+            Sets the tracking mode of the power supply outputs
+
+            :param trackingMode: Tracking mode
+            :raises NotImplementedError Not implemented in this base class
+        """
+        raise NotImplementedError("Not supported by all models")
+
+    def startAutoVoltageStep(self, channel, startMillivolts, stopMillivolts, stepMillivolts, stepTime):
+        """
+            Starts an automatic voltage step from Start mV to Stop mV, incrementing by Step mV every Time seconds
+
+            :param channel: Channel to start voltage step on
+            :param startMillivolts: Starting voltage in mV
+            :param stopMillivolts: End voltage in mV
+            :param stepMillivolts: Amount to increase voltage by in mV
+            :param stepTime: Time to wait before each increase, in Seconds
+            :raises NotImplementedError Not implemented in this base class
+        """
+        raise NotImplementedError("Not supported by all models")
+
+    def stopAutoVoltageStep(self, channel):
+        """
+            Stops the auto voltage step on the specified channel
+
+            :param channel: Channel to stop the auto voltage step on
+            :raises NotImplementedError Not implemented in this base class
+        """
+        raise NotImplementedError("Not supported by all models")
+
+    def startAutoCurrentStep(self, channel, startMilliamps, stopMilliamps, stepMilliamps, stepTime):
+        """
+            Starts an automatic current step from Start mA to Stop mA, incrementing by Step mA every Time seconds
+
+            :param channel: Channel to start current step on
+            :param startMilliamps: Starting current in mA
+            :param stopMilliamps: End current in mA
+            :param stepMilliamps: Amount to increase current by in mA
+            :param stepTime: Time to wait before each increase, in Seconds
+            :raises NotImplementedError Not implemented in this base class
+        """
+        raise NotImplementedError("Not supported by all models")
+
+    def stopAutoCurrentStep(self, channel):
+        """
+            Stops the auto current step on the specified channel
+
+            :param channel: Channel to stop the auto current step on
+            :raises NotImplementedError Not implemented in this base class
+        """
+        raise NotImplementedError("Not supported by all models")
+
+    def setManualVoltageStep(self, channel, stepMillivolts):
+        """
+            Sets the manual step voltage of the channel
+            When a VUP or VDOWN command is sent to the power supply channel, that channel
+            will step up or down by stepMillivolts mV
+
+            :param channel: Channel to set the step voltage for
+            :param stepMillivolts: Voltage to step up or down by when triggered
+            :raises NotImplementedError Not implemented in this base class
+        """
+        raise NotImplementedError("Not supported by all models")
+
+    def stepVoltageUp(self, channel):
+        """
+            Increse the voltage by the configured step voltage on the specified channel
+            Call "setManualVoltageStep" to set the step voltage
+
+            :param channel: Channel to increase the voltage for
+            :raises NotImplementedError Not implemented in this base class
+        """
+        raise NotImplementedError("Not supported by all models")
+
+    def stepVoltageDown(self, channel):
+        """
+            Decrese the voltage by the configured step voltage on the specified channel
+            Call "setManualVoltageStep" to set the step voltage
+
+            :param channel: Channel to decrease the voltage for
+            :raises NotImplementedError Not implemented in this base class
+        """
+        raise NotImplementedError("Not supported by all models")
+
+    def setManualCurrentStep(self, channel, stepMilliamps):
+        """
+            Sets the manual step current of the channel
+            When a IUP or IDOWN command is sent to the power supply channel, that channel
+            will step up or down by stepMilliamps mA
+
+            :param channel: Channel to set the step current for
+            :param stepMilliamps: Current to step up or down by when triggered
+            :raises NotImplementedError Not implemented in this base class
+        """
+        raise NotImplementedError("Not supported by all models")
+
+    def stepCurrentUp(self, channel):
+        """
+            Increse the current by the configured step current on the specified channel
+            Call "setManualCurrentStep" to set the step current
+
+            :param channel: Channel to increase the current for
+            :raises NotImplementedError Not implemented in this base class
+        """
+        raise NotImplementedError("Not supported by all models")
+
+    def stepCurrentDown(self, channel):
+        """
+            Decrese the current by the configured step current on the specified channel
+            Call "setManualCurrentStep" to set the step current
+
+            :param channel: Channel to decrease the current for
+            :raises NotImplementedError Not implemented in this base class
+        """
+        raise NotImplementedError("Not supported by all models")
+
 #
 #
 # Subclasses defining limits for each unit
