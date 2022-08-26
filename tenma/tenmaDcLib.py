@@ -789,6 +789,30 @@ class Tenma72_13320(Tenma72Base):
             raise TenmaException("Channel CH3 can only be set to 2500mV, 3300mV or 5000mV")
         return super().setVoltage(channel, mV)
 
+    def setOCP(self, enable=True):
+        """
+            Enable or disable OCP.
+
+            There's no feedback from the serial connection to determine
+            whether OCP was set or not.
+
+            :param enable: Boolean to enable or disable
+            :raises NotImplementedError: This model doesn't support OCP
+        """
+        raise NotImplementedError("This model does not support OCP")
+
+    def setOVP(self, enable=True):
+        """
+            Enable or disable OVP
+
+            There's no feedback from the serial connection to determine
+            whether OVP was set or not.
+
+            :param enable: Boolean to enable or disable
+            :raises NotImplementedError: This model doesn't support OVP
+        """
+        raise NotImplementedError("This model does not support OVP")
+
     def ON(self, channel=None):
         """
             Turns on the output(s)
