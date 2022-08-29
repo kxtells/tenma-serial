@@ -91,5 +91,5 @@ Or directly from the source code via:
 
 	./gtkIndicator.py
 
-# Known Shortcomings:
+## Known Shortcomings:
  * The physical buttons are blocked for a while after connecting.
