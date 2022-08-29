@@ -67,6 +67,7 @@ def instantiate_tenma_class_from_device_response(device, debug=False):
     print("Could not detect Tenma power supply model, assuming 72_2545")
     return Tenma72_2545(device, debug=debug)
 
+
 def findSubclassesRecursively(cls):
     """
         Finds all subclasses of a given class recursively
@@ -163,10 +164,10 @@ class Tenma72Base(object):
             :raises TenmaException: If the channel is outside the range for the power supply
         """
         if channel > self.NCHANNELS:
-            raise TenmaException("Channel CH{channel} not in range ({nch} channels supported)".format(
-                channel=channel,
-                nch=self.NCHANNELS
-            ))
+            raise TenmaException(
+                "Channel CH{channel} not in range ({nch} channels supported)".format(
+                    channel=channel,
+                    nch=self.NCHANNELS))
 
     def checkVoltage(self, channel, mV):
         """
@@ -177,11 +178,11 @@ class Tenma72Base(object):
             :raises TenmaException: If the voltage is outside the range for the power supply
         """
         if mV > self.MAX_MV:
-            raise TenmaException("Trying to set CH{channel} voltage to {mv}mV, the maximum is {max}mV".format(
-                channel=channel,
-                mv=mV,
-                max=self.MAX_MV
-            ))
+            raise TenmaException(
+                "Trying to set CH{channel} voltage to {mv}mV, the maximum is {max}mV".format(
+                    channel=channel,
+                    mv=mV,
+                    max=self.MAX_MV))
 
     def checkCurrent(self, channel, mA):
         """
@@ -192,11 +193,11 @@ class Tenma72Base(object):
             :raises TenmaException: If the current is outside the range for the power supply
         """
         if mA > self.MAX_MA:
-            raise TenmaException("Trying to set CH{channel} current to {ma}mA, the maximum is {max}mA".format(
-                channel=channel,
-                ma=mA,
-                max=self.MAX_MA
-            ))
+            raise TenmaException(
+                "Trying to set CH{channel} current to {ma}mA, the maximum is {max}mA".format(
+                    channel=channel,
+                    ma=mA,
+                    max=self.MAX_MA))
 
     def getVersion(self, serialEol=""):
         """
@@ -503,9 +504,11 @@ class Tenma72Base(object):
         """
         raise NotImplementedError("Not supported by all models")
 
-    def startAutoVoltageStep(self, channel, startMillivolts, stopMillivolts, stepMillivolts, stepTime):
+    def startAutoVoltageStep(self, channel, startMillivolts,
+                             stopMillivolts, stepMillivolts, stepTime):
         """
-            Starts an automatic voltage step from Start mV to Stop mV, incrementing by Step mV every Time seconds
+            Starts an automatic voltage step from Start mV to Stop mV,
+            incrementing by Step mV every Time seconds
 
             :param channel: Channel to start voltage step on
             :param startMillivolts: Starting voltage in mV
@@ -525,9 +528,11 @@ class Tenma72Base(object):
         """
         raise NotImplementedError("Not supported by all models")
 
-    def startAutoCurrentStep(self, channel, startMilliamps, stopMilliamps, stepMilliamps, stepTime):
+    def startAutoCurrentStep(self, channel, startMilliamps,
+                             stopMilliamps, stepMilliamps, stepTime):
         """
-            Starts an automatic current step from Start mA to Stop mA, incrementing by Step mA every Time seconds
+            Starts an automatic current step from Start mA to Stop mA,
+            incrementing by Step mA every Time seconds
 
             :param channel: Channel to start current step on
             :param startMilliamps: Starting current in mA
@@ -610,6 +615,7 @@ class Tenma72Base(object):
             :raises NotImplementedError Not implemented in this base class
         """
         raise NotImplementedError("Not supported by all models")
+
 
 #
 #
@@ -783,7 +789,8 @@ class Tenma72_13320(Tenma72Base):
 
             :param channel: Channel to set the voltage of
             :param mV: voltage to set the channel to, in mV
-            :raises TenmaException: If the voltage does not match what was set, or if trying to set an invalid voltage on Channel 3
+            :raises TenmaException: If the voltage does not match what was set,
+            or if trying to set an invalid voltage on Channel 3
             :return: The voltage the channel was set to in Volts as a float
         """
         if channel == 3 and mV not in [2500, 3300, 5000]:
@@ -861,12 +868,16 @@ class Tenma72_13320(Tenma72Base):
             :raises TenmaException: If a tracking mode other than 0, 1 or 2 is specified
         """
         if trackingMode not in [0, 1, 2]:
-            raise TenmaException("Tracking mode {} not valid. Use one of: 0 (Independent), 1 (Series), 2 (Parallel)".format(trackingMode))
+            raise TenmaException(
+                ("Tracking mode {} not valid. Use one of:"
+                 " 0 (Independent), 1 (Series), 2 (Parallel)").format(trackingMode))
         self._sendCommand("TRACK{}".format(trackingMode))
 
-    def startAutoVoltageStep(self, channel, startMillivolts, stopMillivolts, stepMillivolts, stepTime):
+    def startAutoVoltageStep(self, channel, startMillivolts,
+                             stopMillivolts, stepMillivolts, stepTime):
         """
-            Starts an automatic voltage step from Start mV to Stop mV, incrementing by Step mV every Time seconds
+            Starts an automatic voltage step from Start mV to Stop mV,
+            incrementing by Step mV every Time seconds
 
             :param channel: Channel to start voltage step on
             :param startMillivolts: Starting voltage in mV
@@ -879,11 +890,12 @@ class Tenma72_13320(Tenma72Base):
         self.checkVoltage(channel, stopMillivolts)
         # TODO: improve this check for when we're stepping down in voltage
         if stepMillivolts > stopMillivolts:
-            raise TenmaException("Channel CH{channel} step voltage {stepMillivolts}V higher than stop voltage {stopMillivolts}V".format(
-                channel=channel,
-                stepMillivolts = stepMillivolts,
-                stopMillivolts = stopMillivolts
-            ))
+            raise TenmaException(
+                ("Channel CH{channel} step voltage {stepMillivolts}V"
+                 " higher than stop voltage {stopMillivolts}V").format(
+                    channel=channel,
+                    stepMillivolts=stepMillivolts,
+                    stopMillivolts=stopMillivolts))
 
         startVolts = float(startMillivolts) / 1000.0
         stopVolts = float(stopMillivolts) / 1000.0
@@ -907,9 +919,11 @@ class Tenma72_13320(Tenma72Base):
         self.checkChannel(channel)
         self._sendCommand("VASTOP{}".format(channel))
 
-    def startAutoCurrentStep(self, channel, startMilliamps, stopMilliamps, stepMilliamps, stepTime):
+    def startAutoCurrentStep(self, channel, startMilliamps,
+                             stopMilliamps, stepMilliamps, stepTime):
         """
-            Starts an automatic current step from Start mA to Stop mA, incrementing by Step mA every Time seconds
+            Starts an automatic current step from Start mA to Stop mA,
+            incrementing by Step mA every Time seconds
 
             :param channel: Channel to start current step on
             :param startMilliamps: Starting current in mA
@@ -921,11 +935,12 @@ class Tenma72_13320(Tenma72Base):
         self.checkChannel(channel)
         self.checkCurrent(channel, stopMilliamps)
         if stepMilliamps > stopMilliamps:
-            raise TenmaException("Channel CH{channel} step current {stepMilliamps}mA higher than stop current {stopMilliamps}mA".format(
-                channel=channel,
-                stepMilliamps = stepMilliamps,
-                stopMilliamps = stopMilliamps
-            ))
+            raise TenmaException(
+                ("Channel CH{channel} step current {stepMilliamps}mA higher"
+                 " than stop current {stopMilliamps}mA").format(
+                    channel=channel,
+                    stepMilliamps=stepMilliamps,
+                    stopMilliamps=stopMilliamps))
 
         startAmps = float(startMilliamps) / 1000.0
         stopAmps = float(stopMilliamps) / 1000.0
