@@ -16,9 +16,11 @@ Supports the following models with predefined limits:
     * 72-2545 -> tested on HW
     * 72-2535 -> Set as manufacturer manual (not tested)
     * 72-2540 -> Set as manufacturer manual (not tested)
-    * 72-2550 -> Set as manufacturer manual (not tested)
+    * 72-2550 -> Tested on HW
     * 72-2930 -> Set as manufacturer manual (not tested)
     * 72-2940 -> Set as manufacturer manual (not tested)
+    * 72-13320 -> Set as manufacturer manual (not tested)
+    * 72-13330 -> Tested on HW
 
 Also, even if not described, should support [Koradka models](https://sigrok.org/wiki/Korad_KAxxxxP_series) and other Velleman units which are just rebrandings of the same internals.
 
