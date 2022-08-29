@@ -663,7 +663,7 @@ class Tenma72_2545(Tenma72Base):
 
 
 class Tenma72_2550(Tenma72Base):
-    #: The 72-2550 we have identifies itself as a Korad KA 6003P internally
+    #: Tenma 72-2550 is also manufactured as Korad KA 6003P
     MATCH_STR = ["72-2550", "KORADKA6003P"]
     #:
     NCHANNELS = 1

@@ -19,7 +19,6 @@
 """
 
 import glob
-import os
 import signal
 import sys
 
@@ -37,9 +36,8 @@ from gi.repository import Notify as notify
 
 try:
     from tenma.tenmaDcLib import instantiate_tenma_class_from_device_response, TenmaException
-except:
+except Exception:
     from tenmaDcLib import instantiate_tenma_class_from_device_response, TenmaException
-
 
 
 APPINDICATOR_ID = 'Tenma DC Power'
@@ -115,7 +113,6 @@ class gtkController():
         self.item_unit_version.set_label(ver[:20])
         self.memoryMenu = self.build_memory_submenu(None, self.T.NCONFS)
 
-
     def memorySelected(self, source):
         """
             Select one of the multiple memories
@@ -128,19 +125,18 @@ class gtkController():
             notify.Notification.new("<b>ERROR</b>", repr(e),
                                     gtk.STOCK_DIALOG_ERROR).show()
 
-
     def build_memory_submenu(self, source, nmemories):
         """
             Build a submenu containing a list of INTS
             with the available memories for the unit
         """
         if not self.memoryMenu:
-            self.memoryMenu= gtk.Menu()
+            self.memoryMenu = gtk.Menu()
 
         for entry in self.memoryMenu.get_children():
             self.memoryMenu.remove(entry)
 
-        for m_index in range(1,nmemories+1):
+        for m_index in range(1, nmemories+1):
             menuEntry = gtk.MenuItem(m_index)
             menuEntry.connect('activate', self.memorySelected)
             self.memoryMenu.append(menuEntry)
@@ -195,7 +191,6 @@ class gtkController():
         self.item_unit_version = gtk.MenuItem("unknown version")
         self.item_unit_version.set_right_justified(True)
         self.item_unit_version.set_sensitive(False)
-
 
         item_quit = gtk.MenuItem('Quit')
         item_quit.connect('activate', self.quit)
@@ -279,6 +274,7 @@ def main():
     indicator.set_menu(controller.build_gtk_menu())
     signal.signal(signal.SIGINT, signal.SIG_DFL)
     gtk.main()
+
 
 if __name__ == "__main__":
     main()

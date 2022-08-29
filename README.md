@@ -13,18 +13,24 @@ A small command line program / library to setup a Tenma 72-XXXX DC POWER SUPPLY 
 
 Supports the following models with predefined limits:
 
-    * 72-2545 -> tested on HW
+    * 72-2545 -> Tested on HW (@kxtells)
     * 72-2535 -> Set as manufacturer manual (not tested)
     * 72-2540 -> Set as manufacturer manual (not tested)
-    * 72-2550 -> Tested on HW
+    * 72-2550 -> Tested on HW (@kxtells)
     * 72-2930 -> Set as manufacturer manual (not tested)
     * 72-2940 -> Set as manufacturer manual (not tested)
     * 72-13320 -> Set as manufacturer manual (not tested)
-    * 72-13330 -> Tested on HW
+    * 72-13330 -> Tested on HW (thomas-phillips-nz)
 
-Also, even if not described, should support [Koradka models](https://sigrok.org/wiki/Korad_KAxxxxP_series) and other Velleman units which are just rebrandings of the same internals.
+Also, even if not described, should support [Koradka
+models](https://sigrok.org/wiki/Korad_KAxxxxP_series) and other Velleman units
+which are just rebrandings of the same internals. Might need to set the
+appropiate `MATCH_STR` in the source code, feel free to open a PR if you test
+it in a known hardware unit.
 
-Originally, Coming back from holidays was hard. So I spent some time with a little game (tongue). You'll find a small explanation of the code in:
+Originally, Coming back from holidays was hard. So I spent some time with a
+little game setting up our power supply(tongue). You'll find a small
+explanation of the original code in:
 
 [https://jcastellssala.com/2017/10/31/tenma72-2540-linux-control/](https://jcastellssala.com/2017/10/31/tenma72-2540-linux-control/)
 
@@ -45,8 +51,11 @@ It does not have many requirements, so you might just clone the repo and run it.
 
 ## Usage examples
 
-Note that it can be connected via a usb to serial cable, or directly with the provided USB cable. In Linux it identifies the usb as `Bus 001 Device 015: ID 0416:5011 Winbond Electronics Corp. Virtual Com Port
-`, running `dmesg` to get where the /dev/ttyACMX device registerd and pointing tenmaControl.py to that device should work.
+Note that it can be connected via a usb to serial cable, or directly with the
+provided USB cable. In Linux it identifies the usb as `Bus 001 Device 015: ID
+0416:5011 Winbond Electronics Corp. Virtual Com Port `, running `dmesg` to get
+where the /dev/ttyACMX device registerd and pointing tenmaControl.py to that
+device should work.
 
 any of the following examples can run via `tenma-control` or `tenmaControl.py`.
 
