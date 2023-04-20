@@ -21,6 +21,7 @@ Supports the following models with predefined limits:
     * 72-2940 -> Set as manufacturer manual (not tested)
     * 72-13320 -> Set as manufacturer manual (not tested)
     * 72-13330 -> Tested on HW (thomas-phillips-nz)
+    * 72-13360 -> Tested on HW (Sebastian Norlin)
 
 Also, even if not described, should support [Koradka
 models](https://sigrok.org/wiki/Korad_KAxxxxP_series) and other Velleman units

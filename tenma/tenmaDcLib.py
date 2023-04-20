@@ -93,6 +93,7 @@ class Tenma72Base(object):
     MAX_MA = 5000
     MAX_MV = 30000
     SERIAL_EOL = ""
+    SERIAL_SETTER_SEPARATOR = ""
 
     def __init__(self, serialPort, debug=False):
         self.ser = serial.Serial(port=serialPort,
@@ -163,6 +164,8 @@ class Tenma72Base(object):
             :param channel: Channel to check
             :raises TenmaException: If the channel is outside the range for the power supply
         """
+        if channel == "":
+            return
         if channel > self.NCHANNELS:
             raise TenmaException(
                 "Channel CH{channel} not in range ({nch} channels supported)".format(
@@ -355,7 +358,7 @@ class Tenma72Base(object):
         """
         self.checkChannel(channel)
 
-        command = "VOUT{}?".format(channel)
+        command = "VOUT{}{}?".format(self.SERIAL_SETTER_SEPARATOR, channel)
         self._sendCommand(command)
         return float(self.__readOutput())
 
@@ -375,7 +378,7 @@ class Tenma72Base(object):
                 nconf=self.NCONFS
             ))
 
-        command = "SAV{}".format(conf)
+        command = "SAV{}{}".format(self.SERIAL_SETTER_SEPARATOR, conf)
         self._sendCommand(command)
 
     def saveConfFlow(self, conf, channel):
@@ -425,7 +428,7 @@ class Tenma72Base(object):
                 conf=conf,
                 nconf=self.NCONFS
             ))
-        self._sendCommand("RCL{}".format(conf))
+        self._sendCommand("RCL{}{}".format(self.SERIAL_SETTER_SEPARATOR, conf))
 
     def setOCP(self, enable=True):
         """
@@ -463,21 +466,21 @@ class Tenma72Base(object):
             :param enable: Boolean to enable or disable
         """
         enableFlag = 1 if enable else 0
-        command = "BEEP{}".format(enableFlag)
+        command = "BEEP{}{}".format(self.SERIAL_SETTER_SEPARATOR, enableFlag)
         self._sendCommand(command)
 
     def ON(self):
         """
             Turns on the output
         """
-        command = "OUT1"
+        command = "OUT{}1".format(self.SERIAL_SETTER_SEPARATOR)
         self._sendCommand(command)
 
     def OFF(self):
         """
             Turns off the output
         """
-        command = "OUT0"
+        command = "OUT{}0".format(self.SERIAL_SETTER_SEPARATOR)
         self._sendCommand(command)
 
     def close(self):
@@ -855,7 +858,7 @@ class Tenma72_13320(Tenma72Base):
             :param enable: Enable lock, defaults to True
         """
         enableFlag = 1 if enable else 0
-        self._sendCommand("LOCK{}".format(enableFlag))
+        self._sendCommand("LOCK{}{}".format(self.SERIAL_SETTER_SEPARATOR, enableFlag))
 
     def setTracking(self, trackingMode):
         """
@@ -1048,3 +1051,209 @@ class Tenma72_13330(Tenma72_13320):
     MAX_MV = 30000
     #:
     SERIAL_EOL = "\n"
+
+class Tenma72_13360(Tenma72_13320):
+    MATCH_STR = ["72-13360"]
+    NCHANNELS = None
+    NCONFS = 5
+    MAX_MA = 15000
+    MAX_MV = 60000
+    SERIAL_EOL = "\n"
+    SERIAL_SETTER_SEPARATOR = ":"
+
+    def getStatus(self):
+        """
+            Returns the power supply status as a dictionary of values
+
+            "ch1Mode ": "C.V" or "C.C",
+            "output ": "ON" or "OFF",
+            "V/C priority ": "Current priority" or "Voltage priority",
+            "beep ": "ON" or "OFF",
+            "lock ": "ON" or "OFF",
+
+            :return: Dictionary of status values
+        """
+        self._sendCommand("STATUS?")
+        statusBytes = self._readBytes()
+
+        # 72-13360 sends two bytes back, the second being '\n'
+        status = statusBytes[0]
+
+        ch1mode = (status & 0b00000001)
+        output = (status & 0b00000010)
+        current_priority = (status & 0b00000100)
+        beep = (status & 0b00010000)
+        lock = (status & 0b00100000)
+
+        return {
+            "ch1Mode ": "C.V" if ch1mode else "C.C",
+            "output ": "ON" if output else "OFF",
+            "V/C priority ": "Current priority" if current_priority else "Voltage priority",
+            "beep ": "ON" if beep else "OFF",
+            "lock ": "ON" if lock else "OFF",
+        }
+    
+    def readCurrent(self, channel=""):
+        """
+            Reads the current setting of the PSU
+
+            :param channel: Is ignored but there for backwards compatability
+            :return: Current for the PSU in Amps as a float
+        """
+        return super().readCurrent("")
+
+    def setCurrent(self, mA):
+        """
+            Sets the current of the PSU
+
+            :param mA: Current to set, in mA
+            :raises TenmaException: If the current does not match what was set
+            :return: The current the PSU was set to in Amps as a float
+        """
+        return super().setCurrent("", mA)
+
+    def readVoltage(self, channel=""):
+        """
+            Reads the voltage setting of the PSU
+
+            :param channel: Is ignored but there for backwards compatability
+            :return: Voltage in Volts as a float
+        """
+        return super().readVoltage("")
+
+    def setVoltage(self, mV):
+        """
+            Sets the voltage of the PSU
+
+            :param mV: voltage to set, in mv
+            :raises TenmaException: If the voltage does not match what was set
+            :return: The voltage the PSU is set to in Volts as a float
+        """
+        return super().setVoltage("", mV)
+
+    def runningCurrent(self):
+        """
+            Returns the current read
+
+            :return: The running current in Amps as a float
+        """
+        return super().runningCurrent("")
+
+    def runningVoltage(self):
+        """
+            Returns the voltage read
+
+            :return: The running voltage in volts as a float
+        """
+        return super().runningVoltage("")
+
+    def setTracking(self, trackingMode):
+        raise NotImplementedError("72-13360 does not support tracking")
+    
+    def setVoltagePriority(self):
+        """
+            Prioritize voltage
+        """
+        self._sendCommand("PRIORITY:0")
+
+    def setCurrentPriority(self):
+        """
+            Prioritize current
+        """
+        self._sendCommand("PRIORITY:1")
+
+    def startAutoVoltageStep(self, startMillivolts,
+                             stopMillivolts, stepMillivolts, stepTime):
+        """
+            Starts an automatic voltage step from Start mV to Stop mV,
+            incrementing by Step mV every Time seconds
+
+            :param startMillivolts: Starting voltage in mV
+            :param stopMillivolts: End voltage in mV
+            :param stepMillivolts: Amount to increase voltage by in mV
+            :param stepTime: Time to wait before each increase, in Seconds
+            :raises TenmaException: If the voltage is invalid
+        """
+        super().startAutoVoltageStep("", startMillivolts, stopMillivolts, stepMillivolts, stepTime)
+
+    def stopAutoVoltageStep(self):
+        """
+            Stops the auto voltage step
+        """
+        super().stopAutoVoltageStep("")
+
+    def startAutoCurrentStep(self, startMilliamps,
+                             stopMilliamps, stepMilliamps, stepTime):
+        """
+            Starts an automatic current step from Start mA to Stop mA,
+            incrementing by Step mA every Time seconds
+
+            :param startMilliamps: Starting current in mA
+            :param stopMilliamps: End current in mA
+            :param stepMilliamps: Amount to increase current by in mA
+            :param stepTime: Time to wait before each increase, in Seconds
+            :raises TenmaException: If the current is invalid
+        """
+        super().startAutoVoltageStep("", startMilliamps, stopMilliamps, stepMilliamps, stepTime)
+
+    def stopAutoCurrentStep(self):
+        """
+            Stops the auto current step
+        """
+        super().stopAutoCurrentStep("")
+
+    def setManualVoltageStep(self, stepMillivolts):
+        """
+            Sets the manual step voltage
+            When a VUP or VDOWN command is sent to the power supply
+            it will step up or down by stepMillivolts mV
+
+            :param stepMillivolts: Voltage to step up or down by when triggered
+        """
+        super().setManualVoltageStep("", stepMillivolts)
+
+    def stepVoltageUp(self):
+        """
+            Increse the voltage by the configured step voltage
+            Call "setManualVoltageStep" to set the step voltage
+        """
+        super().stepVoltageUp("")
+
+    def stepVoltageDown(self):
+        """
+            Decrese the voltage by the configured step voltage
+            Call "setManualVoltageStep" to set the step voltage
+        """
+        super().stepVoltageDown("")
+
+    def setManualCurrentStep(self, stepMilliamps):
+        """
+            Sets the manual step current
+            When a IUP or IDOWN command is sent to the power supply
+            it will step up or down by stepMilliamps mA
+
+            :param stepMilliamps: Current to step up or down by when triggered
+        """
+        super().setManualCurrentStep("", stepMilliamps)
+
+    def stepCurrentUp(self):
+        """
+            Increse the current by the configured step current
+            Call "setManualCurrentStep" to set the step current
+        """
+        super().stepCurrentUp("")
+
+    def stepCurrentDown(self):
+        """
+            Decrese the current by the configured step current
+            Call "setManualCurrentStep" to set the step current
+        """
+        super().stepCurrentDown("")
+
+    def saveConfFlow(self, conf, channel=""):
+        """
+            For Tenma 72-13360 saveConf(3) will save the current voltage and
+            current to memory 3 so there is no need for a more complex saveConf function
+        """
+        raise NotImplementedError("The normal saveConf and recallConf works well for " +
+                                   "Tenma72-13360 so this function has no use")
