@@ -17,6 +17,7 @@ Supports the following models with predefined limits:
     * 72-2535 -> Set as manufacturer manual (not tested)
     * 72-2540 -> Set as manufacturer manual (not tested)
     * 72-2550 -> Tested on HW (@kxtells)
+    * 72-2705 -> Tested on HW (@ollie1400)
     * 72-2930 -> Set as manufacturer manual (not tested)
     * 72-2940 -> Set as manufacturer manual (not tested)
     * 72-13320 -> Set as manufacturer manual (not tested)
