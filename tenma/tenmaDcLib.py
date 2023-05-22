@@ -21,10 +21,11 @@
 
     Supported models:
 
-     * 72_2545 -> tested on HW
+     * 72_2545 -> Tested on HW
      * 72_2535 -> Set as manufacturer manual (not tested)
      * 72_2540 -> Set as manufacturer manual (not tested)
      * 72_2550 -> Tested on HW
+     * 72-2705 -> Tested on HW
      * 72_2930 -> Set as manufacturer manual (not tested)
      * 72_2940 -> Set as manufacturer manual (not tested)
      * 72_13320 -> Set as manufacturer manual (not tested)
@@ -686,6 +687,19 @@ class Tenma72_2930(Tenma72Base):
     MAX_MA = 10000
     #:
     MAX_MV = 30000
+
+
+class Tenma72_2705(Tenma72Base):
+    #:
+    MATCH_STR = ["72-2705"]
+    #:
+    NCHANNELS = 1
+    #:
+    NCONFS = 5
+    #:
+    MAX_MA = 3100
+    #:
+    MAX_MV = 31000
 
 
 class Tenma72_2940(Tenma72Base):
