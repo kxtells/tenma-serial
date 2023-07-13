@@ -22,9 +22,9 @@ import argparse
 # TODO this is just a trick so tenmaControl runs cleanly from both the source tree
 # and the pip installation
 try:
-    from tenma.tenmaDcLib import instantiate_tenma_class_from_device_response, TenmaException
+    from tenma.tenmaDcLib import instantiate_tenma_class_from_device_response, TenmaException, TenmaProtocol
 except Exception:
-    from tenmaDcLib import instantiate_tenma_class_from_device_response, TenmaException
+    from tenmaDcLib import instantiate_tenma_class_from_device_response, TenmaException, TenmaProtocol
 
 
 def main():
@@ -115,12 +115,18 @@ def main():
         if args["voltage"]:
             if VERB:
                 print("Setting voltage to ", args["voltage"])
-            T.setVoltage(args["channel"], args["voltage"])
+            if T.TENMA_PROTOCOL == TenmaProtocol.RS232:
+                T.setVoltage(args["channel"])
+            else:
+                T.setVoltage(args["channel"], args["voltage"])
 
         if args["current"]:
             if VERB:
                 print("Setting current to ", args["current"])
-            T.setCurrent(args["channel"], args["current"])
+            if T.TENMA_PROTOCOL == TenmaProtocol.RS232:
+                T.setCurrent(args["channel"])
+            else:
+                T.setCurrent(args["channel"], args["current"])
 
         if args["save"]:
             if VERB:
@@ -158,11 +164,16 @@ def main():
         if args["runningCurrent"]:
             if VERB:
                 print("Retrieving running Current")
-            print(T.runningCurrent(args["channel"]))
+            if T.TENMA_PROTOCOL == TenmaProtocol.RS232:
+                print(T.runningCurrent())
+            else:
+                print(T.runningCurrent(args["channel"]))
 
         if args["runningVoltage"]:
             if VERB:
                 print("Retrieving running Voltage")
+            if T.TENMA_PROTOCOL == TenmaProtocol.RS232:
+                print(T.runningVoltage())
             print(T.runningVoltage(args["channel"]))
 
     except TenmaException as e:

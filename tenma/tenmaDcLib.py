@@ -29,6 +29,7 @@
      * 72_2940 -> Set as manufacturer manual (not tested)
      * 72_13320 -> Set as manufacturer manual (not tested)
      * 72_13330 -> Tested on HW
+     * 72_13360 -> Tested on HW
 
     Other units from Korad or Vellman might work as well since
     they use the same serial protocol.
@@ -36,11 +37,14 @@
 
 import serial
 import time
-
+from enum import Enum
 
 class TenmaException(Exception):
     pass
 
+class TenmaProtocol(Enum):
+    RS232 = 0
+    RS485 = 1
 
 def instantiate_tenma_class_from_device_response(device, debug=False):
     """
@@ -94,6 +98,7 @@ class Tenma72Base(object):
     MAX_MV = 30000
     SERIAL_EOL = ""
     SERIAL_SETTER_SEPARATOR = ""
+    TENMA_PROTOCOL = TenmaProtocol.RS485
 
     def __init__(self, serialPort, debug=False):
         self.ser = serial.Serial(port=serialPort,
@@ -164,8 +169,8 @@ class Tenma72Base(object):
             :param channel: Channel to check
             :raises TenmaException: If the channel is outside the range for the power supply
         """
-        if channel == "":
-            return
+        if self.TENMA_PROTOCOL == TenmaProtocol.RS232:
+            return # RS232 only supports one channel
         if channel > self.NCHANNELS:
             raise TenmaException(
                 "Channel CH{channel} not in range ({nch} channels supported)".format(
@@ -618,6 +623,18 @@ class Tenma72Base(object):
             :raises NotImplementedError Not implemented in this base class
         """
         raise NotImplementedError("Not supported by all models")
+    
+    def setVoltagePriority(self):
+        """
+            Prioritize voltage
+        """
+        raise NotImplementedError("Not supported by all models")
+
+    def setCurrentPriority(self):
+        """
+            Prioritize current
+        """
+        raise NotImplementedError("Not supported by all models")
 
 
 #
@@ -1053,6 +1070,22 @@ class Tenma72_13330(Tenma72_13320):
     SERIAL_EOL = "\n"
 
 class Tenma72_13360(Tenma72_13320):
+    """
+        Tenma 72-13360 single channel programmable PSU
+        This PSU uses the older RS232 protocol which only supports a single channel.
+        That means that the channel is never specified in the message to the PSU.
+        Because of this, the channel parameter is ignored or absent in all methods.
+
+        The channel parameter is removed from most 13360 methods to reduce
+        confusion over what channel to use, or even what a channel is, to a minimum.
+        That means most of the methods simply call super but with an empty string
+        instead of the channel. This is done rather than making the channel a second,
+        optional, parameter to ensure backwards compatibility.
+
+        It also has other slight variations such as a ":" separator and the
+        STATUS? command returning more general settings.
+    """
+
     MATCH_STR = ["72-13360"]
     NCHANNELS = None
     NCONFS = 5
@@ -1060,6 +1093,7 @@ class Tenma72_13360(Tenma72_13320):
     MAX_MV = 60000
     SERIAL_EOL = "\n"
     SERIAL_SETTER_SEPARATOR = ":"
+    TENMA_PROTOCOL = TenmaProtocol.RS232
 
     def getStatus(self):
         """
@@ -1149,18 +1183,6 @@ class Tenma72_13360(Tenma72_13320):
 
     def setTracking(self, trackingMode):
         raise NotImplementedError("72-13360 does not support tracking")
-    
-    def setVoltagePriority(self):
-        """
-            Prioritize voltage
-        """
-        self._sendCommand("PRIORITY:0")
-
-    def setCurrentPriority(self):
-        """
-            Prioritize current
-        """
-        self._sendCommand("PRIORITY:1")
 
     def startAutoVoltageStep(self, startMillivolts,
                              stopMillivolts, stepMillivolts, stepTime):
@@ -1253,7 +1275,18 @@ class Tenma72_13360(Tenma72_13320):
     def saveConfFlow(self, conf, channel=""):
         """
             For Tenma 72-13360 saveConf(3) will save the current voltage and
-            current to memory 3 so there is no need for a more complex saveConf function
+            current to memory 3 so we just call saveConf directly.
         """
-        raise NotImplementedError("The normal saveConf and recallConf works well for " +
-                                   "Tenma72-13360 so this function has no use")
+        super().saveConf(conf, "")
+
+    def setVoltagePriority(self):
+        """
+            Prioritize voltage
+        """
+        self._sendCommand("PRIORITY:0")
+
+    def setCurrentPriority(self):
+        """
+            Prioritize current
+        """
+        self._sendCommand("PRIORITY:1")
