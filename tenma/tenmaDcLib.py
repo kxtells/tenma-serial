@@ -38,8 +38,10 @@
 import serial
 import time
 
+
 class TenmaException(Exception):
     pass
+
 
 def instantiate_tenma_class_from_device_response(device, debug=False):
     """
@@ -73,7 +75,7 @@ def findSubclassesRecursively(cls):
     """
     for subclass in cls.__subclasses__():
         yield from findSubclassesRecursively(subclass)
-        yield subclass  
+        yield subclass
 
 class TenmaSerialHandler(object):
     """
@@ -533,8 +535,6 @@ class Tenma72Base(object):
         command = "OUT0"
         self._sendCommand(command)
 
-
-
     def setLock(self, enable=True):
         """
             Set the front-panel lock on or off
@@ -662,18 +662,6 @@ class Tenma72Base(object):
 
             :param channel: Channel to decrease the current for
             :raises NotImplementedError Not implemented in this base class
-        """
-        raise NotImplementedError("Not supported by all models")
-    
-    def setVoltagePriority(self):
-        """
-            Prioritize voltage
-        """
-        raise NotImplementedError("Not supported by all models")
-
-    def setCurrentPriority(self):
-        """
-            Prioritize current
         """
         raise NotImplementedError("Not supported by all models")
 

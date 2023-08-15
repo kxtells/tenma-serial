@@ -22,9 +22,9 @@ import argparse
 # TODO this is just a trick so tenmaControl runs cleanly from both the source tree
 # and the pip installation
 try:
-    from tenma.tenmaDcLib import instantiate_tenma_class_from_device_response, TenmaException, TenmaProtocol
+    from tenma.tenmaDcLib import instantiate_tenma_class_from_device_response, TenmaException
 except Exception:
-    from tenmaDcLib import instantiate_tenma_class_from_device_response, TenmaException, TenmaProtocol
+    from tenmaDcLib import instantiate_tenma_class_from_device_response, TenmaException
 
 
 def main():
@@ -115,12 +115,12 @@ def main():
         if args["voltage"]:
             if VERB:
                 print("Setting voltage to ", args["voltage"])
-                T.setVoltage(args["channel"], args["voltage"])
+            T.setVoltage(args["channel"], args["voltage"])
 
         if args["current"]:
             if VERB:
                 print("Setting current to ", args["current"])
-                T.setCurrent(args["channel"], args["current"])
+            T.setCurrent(args["channel"], args["current"])
 
         if args["save"]:
             if VERB:
