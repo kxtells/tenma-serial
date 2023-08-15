@@ -115,17 +115,11 @@ def main():
         if args["voltage"]:
             if VERB:
                 print("Setting voltage to ", args["voltage"])
-            if T.TENMA_PROTOCOL == TenmaProtocol.RS232:
-                T.setVoltage(args["channel"])
-            else:
                 T.setVoltage(args["channel"], args["voltage"])
 
         if args["current"]:
             if VERB:
                 print("Setting current to ", args["current"])
-            if T.TENMA_PROTOCOL == TenmaProtocol.RS232:
-                T.setCurrent(args["channel"])
-            else:
                 T.setCurrent(args["channel"], args["current"])
 
         if args["save"]:
@@ -164,16 +158,11 @@ def main():
         if args["runningCurrent"]:
             if VERB:
                 print("Retrieving running Current")
-            if T.TENMA_PROTOCOL == TenmaProtocol.RS232:
-                print(T.runningCurrent())
-            else:
-                print(T.runningCurrent(args["channel"]))
+            print(T.runningCurrent(args["channel"]))
 
         if args["runningVoltage"]:
             if VERB:
                 print("Retrieving running Voltage")
-            if T.TENMA_PROTOCOL == TenmaProtocol.RS232:
-                print(T.runningVoltage())
             print(T.runningVoltage(args["channel"]))
 
     except TenmaException as e:
