@@ -219,7 +219,8 @@ class Tenma72Base(object):
             :param channel: Channel to check
             :raises TenmaException: If the channel is outside the range for the power supply
         """
-        if channel > self.NCHANNELS:
+        channel = int(channel)
+        if channel > self.NCHANNELS or channel < 1:
             raise TenmaException(
                 "Channel CH{channel} not in range ({nch} channels supported)".format(
                     channel=channel,
@@ -233,7 +234,8 @@ class Tenma72Base(object):
             :param mV: Voltage to check
             :raises TenmaException: If the voltage is outside the range for the power supply
         """
-        if mV > self.MAX_MV:
+        mV = int(mV)
+        if mV > self.MAX_MV or mV < 0:
             raise TenmaException(
                 "Trying to set CH{channel} voltage to {mv}mV, the maximum is {max}mV".format(
                     channel=channel,
@@ -248,7 +250,8 @@ class Tenma72Base(object):
             :param mA: current to check
             :raises TenmaException: If the current is outside the range for the power supply
         """
-        if mA > self.MAX_MA:
+        mA = int(mA)
+        if mA > self.MAX_MA or mA < 0:
             raise TenmaException(
                 "Trying to set CH{channel} current to {ma}mA, the maximum is {max}mA".format(
                     channel=channel,
@@ -1185,7 +1188,8 @@ class Tenma72_13360_base(object):
             :param mV: Voltage to check
             :raises TenmaException: If the voltage is outside the range for the power supply
         """
-        if mV > self.MAX_MV:
+        mV = int(mV)
+        if mV > self.MAX_MV or mV < 0:
             raise TenmaException(
                 "Trying to set voltage to {mv}mV, the maximum is {max}mV".format(
                     mv=mV,
@@ -1198,7 +1202,8 @@ class Tenma72_13360_base(object):
             :param mA: current to check
             :raises TenmaException: If the current is outside the range for the power supply
         """
-        if mA > self.MAX_MA:
+        mA = int(mA)
+        if mA > self.MAX_MA or mA < 0:
             raise TenmaException(
                 "Trying to set current to {ma}mA, the maximum is {max}mA".format(
                     ma=mA,
