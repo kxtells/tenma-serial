@@ -255,6 +255,20 @@ class Tenma72Base(object):
                     ma=mA,
                     max=self.MAX_MA))
 
+    def checkConf(self, conf):
+        """
+            Checks that the given Memory slot is valid for the power supply
+
+            :param conf: Memory slot to check
+            :raises TenmaException: If the Memory slot is outside the range for the power supply
+        """
+        conf = int(conf)
+        if conf > self.NCONFS or conf < 1:
+            raise TenmaException("Trying to use slot M{conf} with only {nconf} slots".format(
+                conf=conf,
+                nconf=self.NCONFS
+            ))
+
     def getVersion(self, serialEol=""):
         """
             Returns a single string with the version of the Tenma Device and Protocol user
@@ -425,12 +439,7 @@ class Tenma72Base(object):
             :param conf: Memory index to store to
             :raises TenmaException: If the memory index is outside the range
         """
-        if conf > self.NCONFS:
-            raise TenmaException("Trying to set M{conf} with only {nconf} slots".format(
-                conf=conf,
-                nconf=self.NCONFS
-            ))
-
+        self.checkConf(conf)
         command = "SAV{}".format(conf)
         self._sendCommand(command)
 
@@ -449,7 +458,7 @@ class Tenma72Base(object):
             :param conf: Memory index to store to
             :param channel: Channel with output to store
         """
-
+        self.checkConf(conf)
         self.OFF()
 
         # Read current voltage
@@ -475,12 +484,7 @@ class Tenma72Base(object):
         """
             Load existing configuration in Memory. Same as pressing any Mx button on the unit
         """
-
-        if conf > self.NCONFS:
-            raise TenmaException("Trying to recall M{conf} with only {nconf} confs".format(
-                conf=conf,
-                nconf=self.NCONFS
-            ))
+        self.checkConf(conf)
         self._sendCommand("RCL{}".format(conf))
 
     def setOCP(self, enable=True):
@@ -1337,7 +1341,8 @@ class Tenma72_13360_base(object):
             :param conf: Memory index to store to
             :raises TenmaException: If the memory index is outside the range
         """
-        if conf > self.NCONFS:
+        conf = int(conf)
+        if conf > self.NCONFS or conf < 1:
             raise TenmaException("Trying to set M{conf} with only {nconf} slots".format(
                 conf=conf,
                 nconf=self.NCONFS
@@ -1357,8 +1362,8 @@ class Tenma72_13360_base(object):
         """
             Load existing configuration in Memory. Same as pressing any Mx button on the unit
         """
-
-        if conf > self.NCONFS:
+        conf = int(conf)
+        if conf > self.NCONFS or conf < 1:
             raise TenmaException("Trying to recall M{conf} with only {nconf} confs".format(
                 conf=conf,
                 nconf=self.NCONFS
