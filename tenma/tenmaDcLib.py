@@ -23,7 +23,7 @@
 
      * 72_2545 -> Tested on HW
      * 72_2535 -> Set as manufacturer manual (not tested)
-     * 72_2540 -> Set as manufacturer manual (not tested)
+     * 72_2540 -> Tested on HW
      * 72_2550 -> Tested on HW
      * 72-2705 -> Tested on HW
      * 72_2930 -> Set as manufacturer manual (not tested)
@@ -688,9 +688,9 @@ class Tenma72_2540(Tenma72Base):
     #: Only 4 physical buttons. But 5 memories are available
     NCONFS = 5
     #:
-    MAX_MA = 5000
+    MAX_MA = 5100
     #:
-    MAX_MV = 30000
+    MAX_MV = 31000
 
 
 class Tenma72_2535(Tenma72Base):
