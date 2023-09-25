@@ -81,7 +81,7 @@ def findSubclassesRecursively(cls):
 class TenmaSerialHandler(object):
     """
     A small class that handles serial communication for tenma power supplies.
-    """   
+    """
 
     def __init__(self, serialPort, serial_eol, debug=False):
         self.ser = serial.Serial(port=serialPort,
@@ -145,7 +145,7 @@ class TenmaSerialHandler(object):
             print("<< ", out.strip())
 
         return out
-    
+
     def close(self):
         """
             Closes the serial port
@@ -171,7 +171,6 @@ class Tenma72Base(object):
     def __init__(self, serialPort, debug=False):
         SERIAL_EOL = ""
         self.serialHandler = TenmaSerialHandler(serialPort, serial_eol = SERIAL_EOL, debug=debug)
-        
         self.DEBUG = debug
 
     def setPort(self, serialPort):
@@ -205,7 +204,7 @@ class Tenma72Base(object):
             :return: Data read as a string
         """
         return self.serialHandler._readOutput()
-    
+
     def close(self):
         """
             Closes the serial port
@@ -786,7 +785,6 @@ class Tenma72_13320(Tenma72Base):
     def __init__(self, serialPort, debug=False):
         SERIAL_EOL = "\n"
         self.serialHandler = TenmaSerialHandler(serialPort, SERIAL_EOL, debug=debug)
-        
         self.DEBUG = debug
 
     def getStatus(self):
@@ -1140,7 +1138,7 @@ class Tenma72_13360_base(object):
     def __init__(self, serialPort, debug=False):
         SERIAL_EOL = "\n"
         self.serialHandler = TenmaSerialHandler(serialPort, SERIAL_EOL, debug=debug)
-        
+
         self.DEBUG = debug
 
     def setPort(self, serialPort):
@@ -1174,7 +1172,7 @@ class Tenma72_13360_base(object):
             :return: Data read as a string
         """
         return self.serialHandler._readOutput()
-    
+
     def close(self):
         """
             Closes the serial port
@@ -1218,7 +1216,7 @@ class Tenma72_13360_base(object):
         """
         self._sendCommand("*IDN?{}".format(serialEol))
         return self.__readOutput()
-        
+
     def getStatus(self):
         """
             Returns the power supply status as a dictionary of values
@@ -1250,7 +1248,7 @@ class Tenma72_13360_base(object):
             "beep ": "ON" if beep else "OFF",
             "lock ": "ON" if lock else "OFF",
         }
-    
+
     def readCurrent(self):
         """
             Reads the current setting
@@ -1337,7 +1335,7 @@ class Tenma72_13360_base(object):
         """
         command = "VOUT?"
         self._sendCommand(command)
-        return float(self.__readOutput())   
+        return float(self.__readOutput())
 
     def saveConf(self, conf):
         """
@@ -1355,7 +1353,7 @@ class Tenma72_13360_base(object):
 
         command = "SAV:{}".format(conf)
         self._sendCommand(command)
-    
+
     def saveConfFlow(self, conf):
         """
             Alias for saveConf as saveConf works as expected on Tenma 13360
