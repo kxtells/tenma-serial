@@ -9,7 +9,7 @@ Provides two basic controllers (tested on Linux) for a TENMA DC power supply via
 
 ## What is this?
 
-A small command line program / library to setup a Tenma 72-XXXX DC POWER SUPPLY from your computer via SERIAL. 
+A small command line program / library to setup a Tenma 72-XXXX DC POWER SUPPLY from your computer via SERIAL.
 
 Supports the following models with predefined limits:
 
@@ -104,3 +104,36 @@ Or directly from the source code via:
 
 ## Known Shortcomings:
  * The physical buttons are blocked for a while after connecting.
+
+# Testing:
+This project contains some [pytest](https://pytest.org) tests to make it easier to add support for new power supply variants, and validate changes to the code.
+
+These tests live under the `tests/` directory in `test_tenma.py`.  There are two environment variables used by the tests:
+ * TENMA_MODEL - set this to the MATCH_STR of the power supply you're testing. Defaults to 72-2540
+ * TENMA_PORT - Optional: set this to the COM/tty port on you PC connected to the power supply. Defaults to auto-finding the port
+
+The tests were written against 72-2540, there are no extra tests for the 72-133XX models (yet). We curerntly test:
+ * PSU init/version string
+ * Set/get voltage
+ * Set/get current
+ * Save/recall memory in all slots
+ * Set/unset beep
+ * Turn output on/off
+
+**Note: Before testing, disconnect everything from the power supply. We try to test as safely as possible, but no promises are made**
+
+First, install pytest:
+
+    pip install pytest
+
+Then you can run the tests from the root directory of the repo:
+
+    python -m pytest
+
+You can set the environment variables when you run the test:
+
+    # Windows:
+    $env:TENMA_MODEL='72-2550'; $env:TENMA_PORT='COM7'; python -m pytest
+
+    # Linux:
+    TENMA_MODEL='72-2550' TENMA_PORT='COM7' python -m pytest
