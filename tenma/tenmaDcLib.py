@@ -36,8 +36,9 @@
     they use the same serial protocol.
 """
 
-import serial
 import time
+
+import serial
 
 
 class TenmaException(Exception):
@@ -78,17 +79,24 @@ def findSubclassesRecursively(cls):
         yield from findSubclassesRecursively(subclass)
         yield subclass
 
+
 class TenmaSerialHandler(object):
     """
     A small class that handles serial communication for tenma power supplies.
     """
 
-    def __init__(self, serialPort, serial_eol, debug=False):
+    def __init__(self, serialPort, serialEOL, debug=False):
+        """
+            :param serialPort: COM/tty device
+            :type serialPort: string
+            :param serialEOL: COM/tty device
+            :type serialPort: string
+        """
         self.ser = serial.Serial(port=serialPort,
                                  baudrate=9600,
                                  parity=serial.PARITY_NONE,
                                  stopbits=serial.STOPBITS_ONE)
-        self.SERIAL_EOL = serial_eol
+        self.SERIAL_EOL = serialEOL
 
         self.DEBUG = debug
 
@@ -97,6 +105,7 @@ class TenmaSerialHandler(object):
             Sets up the serial port with a new COM/tty device
 
             :param serialPort: COM/tty device
+            :type serialPort: string
         """
         self.ser = serial.Serial(port=serialPort,
                                  baudrate=9600,
@@ -108,6 +117,7 @@ class TenmaSerialHandler(object):
             Sends a command to the serial port of a power supply
 
             :param command: Command to send
+            :type command: string
         """
         if self.DEBUG:
             print(">> ", command.strip())
@@ -152,6 +162,7 @@ class TenmaSerialHandler(object):
         """
         self.ser.close()
 
+
 class Tenma72Base(object):
     """
         Control a Tenma 72-XXXX DC bench power supply
@@ -170,7 +181,7 @@ class Tenma72Base(object):
 
     def __init__(self, serialPort, debug=False):
         SERIAL_EOL = ""
-        self.serialHandler = TenmaSerialHandler(serialPort, serial_eol = SERIAL_EOL, debug=debug)
+        self.serialHandler = TenmaSerialHandler(serialPort, SERIAL_EOL, debug=debug)
         self.DEBUG = debug
 
     def setPort(self, serialPort):
@@ -178,6 +189,7 @@ class Tenma72Base(object):
             Sets up the serial port with a new COM/tty device
 
             :param serialPort: COM/tty device
+            :type serialPort: string
         """
         self.serialHandler.setPort(serialPort)
 
@@ -186,6 +198,7 @@ class Tenma72Base(object):
             Sends a command to the serial port of a power supply
 
             :param command: Command to send
+            :type command: Command to send
         """
         self.serialHandler._sendCommand(command)
 
@@ -216,6 +229,7 @@ class Tenma72Base(object):
             Checks that the given channel is valid for the power supply
 
             :param channel: Channel to check
+            :type channel: int
             :raises TenmaException: If the channel is outside the range for the power supply
         """
         channel = int(channel)
@@ -230,7 +244,9 @@ class Tenma72Base(object):
             Checks that the given voltage is valid for the power supply
 
             :param channel: Channel to check
+            :type channel: int
             :param mV: Voltage to check
+            :type mV: int
             :raises TenmaException: If the voltage is outside the range for the power supply
         """
         mV = int(mV)
@@ -246,7 +262,9 @@ class Tenma72Base(object):
             Checks that the given current is valid for the power supply
 
             :param channel: Channel to check
+            :type channel: int
             :param mA: current to check
+            :type mA: int
             :raises TenmaException: If the current is outside the range for the power supply
         """
         mA = int(mA)
@@ -262,6 +280,7 @@ class Tenma72Base(object):
             Checks that the given Memory slot is valid for the power supply
 
             :param conf: Memory slot to check
+            :ptype conf: int
             :raises TenmaException: If the Memory slot is outside the range for the power supply
         """
         conf = int(conf)
@@ -275,7 +294,12 @@ class Tenma72Base(object):
         """
             Returns a single string with the version of the Tenma Device and Protocol user
 
+            TODO: Get version probably does not need serialEOL since now we use a specific
+            serialHandler per class and the instantiate_function (the only one using it)
+            can use `getVersion` from each specific class.
+
             :param serialEol: End of line terminator, defaults to ""
+            :type serialEol: string
             :return: The version string from the power supply
         """
         self._sendCommand("*IDN?{}".format(serialEol))
@@ -345,7 +369,9 @@ class Tenma72Base(object):
             Sets the current of the specified channel
 
             :param channel: Channel to set the current of
+            :type channel: int
             :param mA: Current to set the channel to, in mA
+            :type mA: int
             :raises TenmaException: If the current does not match what was set
             :return: The current the channel was set to in Amps as a float
         """
@@ -371,6 +397,7 @@ class Tenma72Base(object):
             Reads the voltage setting for the given channel
 
             :param channel: Channel to read the voltage of
+            :type channel: int
             :return: Voltage for the channel in Volts as a float
         """
         self.checkChannel(channel)
@@ -384,7 +411,9 @@ class Tenma72Base(object):
             Sets the voltage of the specified channel
 
             :param channel: Channel to set the voltage of
+            :type channel: int
             :param mV: voltage to set the channel to, in mV
+            :type mV: int
             :raises TenmaException: If the voltage does not match what was set
             :return: The voltage the channel was set to in Volts as a float
         """
@@ -410,6 +439,7 @@ class Tenma72Base(object):
             Returns the current read of a running channel
 
             :param channel: Channel to get the running current for
+            :type channel: int
             :return: The running current of the channel in Amps as a float
         """
         self.checkChannel(channel)
@@ -423,6 +453,7 @@ class Tenma72Base(object):
             Returns the voltage read of a running channel
 
             :param channel: Channel to get the running voltage for
+            :type channel: int
             :return: The running voltage of the channel in volts as a float
         """
         self.checkChannel(channel)
@@ -439,6 +470,7 @@ class Tenma72Base(object):
             We actually need to recall memory 4, set configuration and then SAV(4)
 
             :param conf: Memory index to store to
+            :type conf: int
             :raises TenmaException: If the memory index is outside the range
         """
         self.checkConf(conf)
@@ -458,7 +490,9 @@ class Tenma72Base(object):
              * Save to that memory conf
 
             :param conf: Memory index to store to
+            :type conf: int
             :param channel: Channel with output to store
+            :type channel: int
         """
         self.checkConf(conf)
         self.OFF()
@@ -485,6 +519,9 @@ class Tenma72Base(object):
     def recallConf(self, conf):
         """
             Load existing configuration in Memory. Same as pressing any Mx button on the unit
+
+            :param conf: Memory index to recall
+            :type conf: int
         """
         self.checkConf(conf)
         self._sendCommand("RCL{}".format(conf))
@@ -497,6 +534,7 @@ class Tenma72Base(object):
             whether OCP was set or not.
 
             :param enable: Boolean to enable or disable
+            :type enable: boolean
         """
         enableFlag = 1 if enable else 0
         command = "OCP{}".format(enableFlag)
@@ -510,6 +548,7 @@ class Tenma72Base(object):
             whether OVP was set or not.
 
             :param enable: Boolean to enable or disable
+            :type enable: boolean
         """
         enableFlag = 1 if enable else 0
         command = "OVP{}".format(enableFlag)
@@ -523,6 +562,7 @@ class Tenma72Base(object):
             whether BEEP was set or not.
 
             :param enable: Boolean to enable or disable
+            :type enable: boolean
         """
         enableFlag = 1 if enable else 0
         command = "BEEP{}".format(enableFlag)
@@ -547,6 +587,7 @@ class Tenma72Base(object):
             Set the front-panel lock on or off
 
             :param enable: Enable lock, defaults to True
+            :type enable: boolean
             :raises NotImplementedError Not implemented in this base class
         """
         raise NotImplementedError("Not supported by all models")
@@ -556,6 +597,7 @@ class Tenma72Base(object):
             Sets the tracking mode of the power supply outputs
 
             :param trackingMode: Tracking mode
+            :type trackingMode: boolean
             :raises NotImplementedError Not implemented in this base class
         """
         raise NotImplementedError("Not supported by all models")
@@ -567,10 +609,15 @@ class Tenma72Base(object):
             incrementing by Step mV every Time seconds
 
             :param channel: Channel to start voltage step on
+            :type channel: int
             :param startMillivolts: Starting voltage in mV
+            :type startMillivolts: int
             :param stopMillivolts: End voltage in mV
+            :type stopMillivolts: int
             :param stepMillivolts: Amount to increase voltage by in mV
+            :type stepMillivolts: int
             :param stepTime: Time to wait before each increase, in Seconds
+            :type stepTime: int
             :raises NotImplementedError Not implemented in this base class
         """
         raise NotImplementedError("Not supported by all models")
@@ -580,6 +627,7 @@ class Tenma72Base(object):
             Stops the auto voltage step on the specified channel
 
             :param channel: Channel to stop the auto voltage step on
+            :type channel: int
             :raises NotImplementedError Not implemented in this base class
         """
         raise NotImplementedError("Not supported by all models")
@@ -591,10 +639,15 @@ class Tenma72Base(object):
             incrementing by Step mA every Time seconds
 
             :param channel: Channel to start current step on
+            :type channel: int
             :param startMilliamps: Starting current in mA
+            :type statMilliamps: int
             :param stopMilliamps: End current in mA
+            :type stopMilliamps: int
             :param stepMilliamps: Amount to increase current by in mA
+            :type stepMilliamps: int
             :param stepTime: Time to wait before each increase, in Seconds
+            :type stepTime: int
             :raises NotImplementedError Not implemented in this base class
         """
         raise NotImplementedError("Not supported by all models")
@@ -604,6 +657,7 @@ class Tenma72Base(object):
             Stops the auto current step on the specified channel
 
             :param channel: Channel to stop the auto current step on
+            :type channel: int
             :raises NotImplementedError Not implemented in this base class
         """
         raise NotImplementedError("Not supported by all models")
@@ -615,7 +669,9 @@ class Tenma72Base(object):
             will step up or down by stepMillivolts mV
 
             :param channel: Channel to set the step voltage for
+            :type channel: int
             :param stepMillivolts: Voltage to step up or down by when triggered
+            :type stepMillivolts: int
             :raises NotImplementedError Not implemented in this base class
         """
         raise NotImplementedError("Not supported by all models")
@@ -626,6 +682,7 @@ class Tenma72Base(object):
             Call "setManualVoltageStep" to set the step voltage
 
             :param channel: Channel to increase the voltage for
+            :type channel: int
             :raises NotImplementedError Not implemented in this base class
         """
         raise NotImplementedError("Not supported by all models")
@@ -636,6 +693,7 @@ class Tenma72Base(object):
             Call "setManualVoltageStep" to set the step voltage
 
             :param channel: Channel to decrease the voltage for
+            :type channel: int
             :raises NotImplementedError Not implemented in this base class
         """
         raise NotImplementedError("Not supported by all models")
@@ -647,7 +705,9 @@ class Tenma72Base(object):
             will step up or down by stepMilliamps mA
 
             :param channel: Channel to set the step current for
+            :type channel: int
             :param stepMilliamps: Current to step up or down by when triggered
+            :type stepMilliamps: int
             :raises NotImplementedError Not implemented in this base class
         """
         raise NotImplementedError("Not supported by all models")
@@ -658,6 +718,7 @@ class Tenma72Base(object):
             Call "setManualCurrentStep" to set the step current
 
             :param channel: Channel to increase the current for
+            :type channel: int
             :raises NotImplementedError Not implemented in this base class
         """
         raise NotImplementedError("Not supported by all models")
@@ -668,6 +729,7 @@ class Tenma72Base(object):
             Call "setManualCurrentStep" to set the step current
 
             :param channel: Channel to decrease the current for
+            :type channel: int
             :raises NotImplementedError Not implemented in this base class
         """
         raise NotImplementedError("Not supported by all models")
@@ -836,6 +898,7 @@ class Tenma72_13320(Tenma72Base):
             Reads the current setting for the given channel
 
             :param channel: Channel to read the current of
+            :type channel: iint
             :return: Current for the channel in Amps as a float
             :raises TenmaException: If trying to read the current of Channel 3
         """
@@ -848,7 +911,9 @@ class Tenma72_13320(Tenma72Base):
             Returns the current read of a running channel
 
             :param channel: Channel to get the running current for
+            :type channel: iint
             :return: The running current of the channel in Amps as a float
+
             :raises TenmaException: If trying to read the current of Channel 3
         """
         if channel == 3:
@@ -860,10 +925,13 @@ class Tenma72_13320(Tenma72Base):
             Sets the voltage of the specified channel
 
             :param channel: Channel to set the voltage of
+            :type channel: int
             :param mV: voltage to set the channel to, in mV
+            :type mV: int
+            :return: The voltage the channel was set to in Volts as a float
+
             :raises TenmaException: If the voltage does not match what was set,
             or if trying to set an invalid voltage on Channel 3
-            :return: The voltage the channel was set to in Volts as a float
         """
         if channel == 3 and mV not in [2500, 3300, 5000]:
             raise TenmaException("Channel CH3 can only be set to 2500mV, 3300mV or 5000mV")
@@ -877,6 +945,7 @@ class Tenma72_13320(Tenma72Base):
             whether OCP was set or not.
 
             :param enable: Boolean to enable or disable
+            :type enable: boolean
             :raises NotImplementedError: This model doesn't support OCP
         """
         raise NotImplementedError("This model does not support OCP")
@@ -889,6 +958,7 @@ class Tenma72_13320(Tenma72Base):
             whether OVP was set or not.
 
             :param enable: Boolean to enable or disable
+            :type enable: boolean
             :raises NotImplementedError: This model doesn't support OVP
         """
         raise NotImplementedError("This model does not support OVP")
@@ -898,6 +968,7 @@ class Tenma72_13320(Tenma72Base):
             Turns on the output(s)
 
             :param channel: Channel to turn on, defaults to None (turn all channels on)
+            :type channel: int
         """
         if channel is None:
             command = "OUT12:1"
@@ -912,6 +983,7 @@ class Tenma72_13320(Tenma72Base):
             Turns off the output(s)
 
             :param channel: Channel to turn on, defaults to None (turn all channels off)
+            :type channel: int
         """
         if channel is None:
             command = "OUT12:0"
@@ -925,6 +997,7 @@ class Tenma72_13320(Tenma72Base):
             Set the front-panel lock on or off
 
             :param enable: Enable lock, defaults to True
+            :type enable: boolean
         """
         enableFlag = 1 if enable else 0
         self._sendCommand("LOCK{}".format(enableFlag))
@@ -937,6 +1010,7 @@ class Tenma72_13320(Tenma72Base):
             2: Parallel
 
             :param trackingMode: one of 0, 1 or 2
+            :type trackingMode: int
             :raises TenmaException: If a tracking mode other than 0, 1 or 2 is specified
         """
         if trackingMode not in [0, 1, 2]:
@@ -952,10 +1026,15 @@ class Tenma72_13320(Tenma72Base):
             incrementing by Step mV every Time seconds
 
             :param channel: Channel to start voltage step on
+            :type channel: int
             :param startMillivolts: Starting voltage in mV
+            :type startMillivolts: int
             :param stopMillivolts: End voltage in mV
+            :type stopMillivolts: int
             :param stepMillivolts: Amount to increase voltage by in mV
+            :type stepMillivolts: int
             :param stepTime: Time to wait before each increase, in Seconds
+            :type stepTime: int
             :raises TenmaException: If the channel or voltage is invalid
         """
         self.checkChannel(channel)
@@ -987,6 +1066,7 @@ class Tenma72_13320(Tenma72Base):
             Stops the auto voltage step on the specified channel
 
             :param channel: Channel to stop the auto voltage step on
+            :type channel: int
         """
         self.checkChannel(channel)
         self._sendCommand("VASTOP{}".format(channel))
@@ -998,10 +1078,15 @@ class Tenma72_13320(Tenma72Base):
             incrementing by Step mA every Time seconds
 
             :param channel: Channel to start current step on
+            :type channel: int
             :param startMilliamps: Starting current in mA
+            :type startMilliamps: int
             :param stopMilliamps: End current in mA
+            :type stopMilliamps: int
             :param stepMilliamps: Amount to increase current by in mA
+            :type stepMilliamps: int
             :param stepTime: Time to wait before each increase, in Seconds
+            :type stepTime: int
             :raises TenmaException: If the channel or current is invalid
         """
         self.checkChannel(channel)
@@ -1032,6 +1117,7 @@ class Tenma72_13320(Tenma72Base):
             Stops the auto current step on the specified channel
 
             :param channel: Channel to stop the auto current step on
+            :type channel: int
         """
         self.checkChannel(channel)
         self._sendCommand("IASTOP{}".format(channel))
@@ -1043,7 +1129,9 @@ class Tenma72_13320(Tenma72Base):
             will step up or down by stepMillivolts mV
 
             :param channel: Channel to set the step voltage for
+            :type channel: int
             :param stepMillivolts: Voltage to step up or down by when triggered
+            :type stepMillivolts: int
         """
         self.checkChannel(channel)
         self.checkVoltage(channel, stepMillivolts)
@@ -1057,6 +1145,7 @@ class Tenma72_13320(Tenma72Base):
             Call "setManualVoltageStep" to set the step voltage
 
             :param channel: Channel to increase the voltage for
+            :type channel: int
         """
         self.checkChannel(channel)
         self._sendCommand("VUP{}".format(channel))
@@ -1067,6 +1156,7 @@ class Tenma72_13320(Tenma72Base):
             Call "setManualVoltageStep" to set the step voltage
 
             :param channel: Channel to decrease the voltage for
+            :type channel: int
         """
         self.checkChannel(channel)
         self._sendCommand("VDOWN{}".format(channel))
@@ -1078,7 +1168,9 @@ class Tenma72_13320(Tenma72Base):
             will step up or down by stepMilliamps mA
 
             :param channel: Channel to set the step current for
+            :type channel: int
             :param stepMilliamps: Current to step up or down by when triggered
+            :type stepMilliamps: int
         """
         self.checkChannel(channel)
         self.checkCurrent(channel, stepMilliamps)
@@ -1092,6 +1184,7 @@ class Tenma72_13320(Tenma72Base):
             Call "setManualCurrentStep" to set the step current
 
             :param channel: Channel to increase the current for
+            :type channel: int
         """
         self.checkChannel(channel)
         self._sendCommand("IUP{}".format(channel))
@@ -1102,6 +1195,7 @@ class Tenma72_13320(Tenma72Base):
             Call "setManualCurrentStep" to set the step current
 
             :param channel: Channel to decrease the current for
+            :type channel: int
         """
         self.checkChannel(channel)
         self._sendCommand("IDOWN{}".format(channel))
@@ -1118,6 +1212,7 @@ class Tenma72_13330(Tenma72_13320):
     MAX_MA = 5000
     #:
     MAX_MV = 30000
+
 
 class Tenma72_13360_base(object):
     """
@@ -1459,7 +1554,7 @@ class Tenma72_13360_base(object):
             :param stepTime: Time to wait before each increase, in Seconds
             :raises TenmaException: If the current is invalid
         """
-        self.checkCurrent( stopMilliamps)
+        self.checkCurrent(stopMilliamps)
         if stepMilliamps > stopMilliamps:
             raise TenmaException(
                 ("step current {stepMilliamps}mA higher"
@@ -1550,6 +1645,7 @@ class Tenma72_13360_base(object):
             Prioritize current
         """
         self._sendCommand("PRIORITY:1")
+
 
 class Tenma72_13360(Tenma72_13360_base):
     MATCH_STR = ["72-13360"]
