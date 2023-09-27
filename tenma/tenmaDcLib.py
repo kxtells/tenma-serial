@@ -1,4 +1,4 @@
-#    Copyright (C) 2017,2019,2020 Jordi Castells
+#    Copyright (C) 2017-2023 Jordi Castells
 #
 #
 #   this file is part of tenma-serial
