@@ -23,7 +23,7 @@
 
      * 72_2545 -> Tested on HW
      * 72_2535 -> Set as manufacturer manual (not tested)
-     * 72_2540 -> Set as manufacturer manual (not tested)
+     * 72_2540 -> Tested on HW
      * 72_2550 -> Tested on HW
      * 72-2705 -> Tested on HW
      * 72_2930 -> Set as manufacturer manual (not tested)
@@ -81,7 +81,7 @@ def findSubclassesRecursively(cls):
 class TenmaSerialHandler(object):
     """
     A small class that handles serial communication for tenma power supplies.
-    """   
+    """
 
     def __init__(self, serialPort, serial_eol, debug=False):
         self.ser = serial.Serial(port=serialPort,
@@ -145,7 +145,7 @@ class TenmaSerialHandler(object):
             print("<< ", out.strip())
 
         return out
-    
+
     def close(self):
         """
             Closes the serial port
@@ -171,7 +171,6 @@ class Tenma72Base(object):
     def __init__(self, serialPort, debug=False):
         SERIAL_EOL = ""
         self.serialHandler = TenmaSerialHandler(serialPort, serial_eol = SERIAL_EOL, debug=debug)
-        
         self.DEBUG = debug
 
     def setPort(self, serialPort):
@@ -205,7 +204,7 @@ class Tenma72Base(object):
             :return: Data read as a string
         """
         return self.serialHandler._readOutput()
-    
+
     def close(self):
         """
             Closes the serial port
@@ -219,7 +218,8 @@ class Tenma72Base(object):
             :param channel: Channel to check
             :raises TenmaException: If the channel is outside the range for the power supply
         """
-        if channel > self.NCHANNELS:
+        channel = int(channel)
+        if channel > self.NCHANNELS or channel < 1:
             raise TenmaException(
                 "Channel CH{channel} not in range ({nch} channels supported)".format(
                     channel=channel,
@@ -233,7 +233,8 @@ class Tenma72Base(object):
             :param mV: Voltage to check
             :raises TenmaException: If the voltage is outside the range for the power supply
         """
-        if mV > self.MAX_MV:
+        mV = int(mV)
+        if mV > self.MAX_MV or mV < 0:
             raise TenmaException(
                 "Trying to set CH{channel} voltage to {mv}mV, the maximum is {max}mV".format(
                     channel=channel,
@@ -248,12 +249,27 @@ class Tenma72Base(object):
             :param mA: current to check
             :raises TenmaException: If the current is outside the range for the power supply
         """
-        if mA > self.MAX_MA:
+        mA = int(mA)
+        if mA > self.MAX_MA or mA < 0:
             raise TenmaException(
                 "Trying to set CH{channel} current to {ma}mA, the maximum is {max}mA".format(
                     channel=channel,
                     ma=mA,
                     max=self.MAX_MA))
+
+    def checkConf(self, conf):
+        """
+            Checks that the given Memory slot is valid for the power supply
+
+            :param conf: Memory slot to check
+            :raises TenmaException: If the Memory slot is outside the range for the power supply
+        """
+        conf = int(conf)
+        if conf > self.NCONFS or conf < 1:
+            raise TenmaException("Trying to use slot M{conf} with only {nconf} slots".format(
+                conf=conf,
+                nconf=self.NCONFS
+            ))
 
     def getVersion(self, serialEol=""):
         """
@@ -425,12 +441,7 @@ class Tenma72Base(object):
             :param conf: Memory index to store to
             :raises TenmaException: If the memory index is outside the range
         """
-        if conf > self.NCONFS:
-            raise TenmaException("Trying to set M{conf} with only {nconf} slots".format(
-                conf=conf,
-                nconf=self.NCONFS
-            ))
-
+        self.checkConf(conf)
         command = "SAV{}".format(conf)
         self._sendCommand(command)
 
@@ -449,7 +460,7 @@ class Tenma72Base(object):
             :param conf: Memory index to store to
             :param channel: Channel with output to store
         """
-
+        self.checkConf(conf)
         self.OFF()
 
         # Read current voltage
@@ -475,12 +486,7 @@ class Tenma72Base(object):
         """
             Load existing configuration in Memory. Same as pressing any Mx button on the unit
         """
-
-        if conf > self.NCONFS:
-            raise TenmaException("Trying to recall M{conf} with only {nconf} confs".format(
-                conf=conf,
-                nconf=self.NCONFS
-            ))
+        self.checkConf(conf)
         self._sendCommand("RCL{}".format(conf))
 
     def setOCP(self, enable=True):
@@ -681,9 +687,9 @@ class Tenma72_2540(Tenma72Base):
     #: Only 4 physical buttons. But 5 memories are available
     NCONFS = 5
     #:
-    MAX_MA = 5000
+    MAX_MA = 5100
     #:
-    MAX_MV = 30000
+    MAX_MV = 31000
 
 
 class Tenma72_2535(Tenma72Base):
@@ -779,7 +785,6 @@ class Tenma72_13320(Tenma72Base):
     def __init__(self, serialPort, debug=False):
         SERIAL_EOL = "\n"
         self.serialHandler = TenmaSerialHandler(serialPort, SERIAL_EOL, debug=debug)
-        
         self.DEBUG = debug
 
     def getStatus(self):
@@ -1133,7 +1138,7 @@ class Tenma72_13360_base(object):
     def __init__(self, serialPort, debug=False):
         SERIAL_EOL = "\n"
         self.serialHandler = TenmaSerialHandler(serialPort, SERIAL_EOL, debug=debug)
-        
+
         self.DEBUG = debug
 
     def setPort(self, serialPort):
@@ -1167,7 +1172,7 @@ class Tenma72_13360_base(object):
             :return: Data read as a string
         """
         return self.serialHandler._readOutput()
-    
+
     def close(self):
         """
             Closes the serial port
@@ -1181,7 +1186,8 @@ class Tenma72_13360_base(object):
             :param mV: Voltage to check
             :raises TenmaException: If the voltage is outside the range for the power supply
         """
-        if mV > self.MAX_MV:
+        mV = int(mV)
+        if mV > self.MAX_MV or mV < 0:
             raise TenmaException(
                 "Trying to set voltage to {mv}mV, the maximum is {max}mV".format(
                     mv=mV,
@@ -1194,7 +1200,8 @@ class Tenma72_13360_base(object):
             :param mA: current to check
             :raises TenmaException: If the current is outside the range for the power supply
         """
-        if mA > self.MAX_MA:
+        mA = int(mA)
+        if mA > self.MAX_MA or mA < 0:
             raise TenmaException(
                 "Trying to set current to {ma}mA, the maximum is {max}mA".format(
                     ma=mA,
@@ -1209,7 +1216,7 @@ class Tenma72_13360_base(object):
         """
         self._sendCommand("*IDN?{}".format(serialEol))
         return self.__readOutput()
-        
+
     def getStatus(self):
         """
             Returns the power supply status as a dictionary of values
@@ -1241,7 +1248,7 @@ class Tenma72_13360_base(object):
             "beep ": "ON" if beep else "OFF",
             "lock ": "ON" if lock else "OFF",
         }
-    
+
     def readCurrent(self):
         """
             Reads the current setting
@@ -1328,7 +1335,7 @@ class Tenma72_13360_base(object):
         """
         command = "VOUT?"
         self._sendCommand(command)
-        return float(self.__readOutput())   
+        return float(self.__readOutput())
 
     def saveConf(self, conf):
         """
@@ -1337,7 +1344,8 @@ class Tenma72_13360_base(object):
             :param conf: Memory index to store to
             :raises TenmaException: If the memory index is outside the range
         """
-        if conf > self.NCONFS:
+        conf = int(conf)
+        if conf > self.NCONFS or conf < 1:
             raise TenmaException("Trying to set M{conf} with only {nconf} slots".format(
                 conf=conf,
                 nconf=self.NCONFS
@@ -1345,7 +1353,7 @@ class Tenma72_13360_base(object):
 
         command = "SAV:{}".format(conf)
         self._sendCommand(command)
-    
+
     def saveConfFlow(self, conf):
         """
             Alias for saveConf as saveConf works as expected on Tenma 13360
@@ -1357,8 +1365,8 @@ class Tenma72_13360_base(object):
         """
             Load existing configuration in Memory. Same as pressing any Mx button on the unit
         """
-
-        if conf > self.NCONFS:
+        conf = int(conf)
+        if conf > self.NCONFS or conf < 1:
             raise TenmaException("Trying to recall M{conf} with only {nconf} confs".format(
                 conf=conf,
                 nconf=self.NCONFS

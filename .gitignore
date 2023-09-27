@@ -8,3 +8,4 @@ tests/.coverage
 tests/coverage.xml
 tests/htmlcov/
 tests/test-results/
+.vscode
