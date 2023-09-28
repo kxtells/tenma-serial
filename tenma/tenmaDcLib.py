@@ -75,9 +75,11 @@ def findSubclassesRecursively(cls):
     """
         Finds all subclasses of a given class recursively
     """
+    all_subclasses = []
     for subclass in cls.__subclasses__():
-        yield from findSubclassesRecursively(subclass)
-        yield subclass
+        all_subclasses.append(subclass)
+        all_subclasses.extend(findSubclassesRecursively(subclass))
+    return all_subclasses
 
 
 class TenmaSerialHandler(object):
