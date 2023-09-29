@@ -619,7 +619,7 @@ class Tenma72Base(object):
             :param stepMillivolts: Amount to increase voltage by in mV
             :type stepMillivolts: int
             :param stepTime: Time to wait before each increase, in Seconds
-            :type stepTime: int
+            :type stepTime: float
             :raises NotImplementedError Not implemented in this base class
         """
         raise NotImplementedError("Not supported by all models")
@@ -649,7 +649,7 @@ class Tenma72Base(object):
             :param stepMilliamps: Amount to increase current by in mA
             :type stepMilliamps: int
             :param stepTime: Time to wait before each increase, in Seconds
-            :type stepTime: int
+            :type stepTime: float
             :raises NotImplementedError Not implemented in this base class
         """
         raise NotImplementedError("Not supported by all models")
@@ -1036,7 +1036,7 @@ class Tenma72_13320(Tenma72Base):
             :param stepMillivolts: Amount to increase voltage by in mV
             :type stepMillivolts: int
             :param stepTime: Time to wait before each increase, in Seconds
-            :type stepTime: int
+            :type stepTime: float
             :raises TenmaException: If the channel or voltage is invalid
         """
         self.checkChannel(channel)
@@ -1088,7 +1088,7 @@ class Tenma72_13320(Tenma72Base):
             :param stepMilliamps: Amount to increase current by in mA
             :type stepMilliamps: int
             :param stepTime: Time to wait before each increase, in Seconds
-            :type stepTime: int
+            :type stepTime: float
             :raises TenmaException: If the channel or current is invalid
         """
         self.checkChannel(channel)
