@@ -75,9 +75,11 @@ def findSubclassesRecursively(cls):
     """
         Finds all subclasses of a given class recursively
     """
+    all_subclasses = []
     for subclass in cls.__subclasses__():
-        yield from findSubclassesRecursively(subclass)
-        yield subclass
+        all_subclasses.append(subclass)
+        all_subclasses.extend(findSubclassesRecursively(subclass))
+    return all_subclasses
 
 
 class TenmaSerialHandler(object):
@@ -617,7 +619,7 @@ class Tenma72Base(object):
             :param stepMillivolts: Amount to increase voltage by in mV
             :type stepMillivolts: int
             :param stepTime: Time to wait before each increase, in Seconds
-            :type stepTime: int
+            :type stepTime: float
             :raises NotImplementedError Not implemented in this base class
         """
         raise NotImplementedError("Not supported by all models")
@@ -647,7 +649,7 @@ class Tenma72Base(object):
             :param stepMilliamps: Amount to increase current by in mA
             :type stepMilliamps: int
             :param stepTime: Time to wait before each increase, in Seconds
-            :type stepTime: int
+            :type stepTime: float
             :raises NotImplementedError Not implemented in this base class
         """
         raise NotImplementedError("Not supported by all models")
@@ -1034,7 +1036,7 @@ class Tenma72_13320(Tenma72Base):
             :param stepMillivolts: Amount to increase voltage by in mV
             :type stepMillivolts: int
             :param stepTime: Time to wait before each increase, in Seconds
-            :type stepTime: int
+            :type stepTime: float
             :raises TenmaException: If the channel or voltage is invalid
         """
         self.checkChannel(channel)
@@ -1086,7 +1088,7 @@ class Tenma72_13320(Tenma72Base):
             :param stepMilliamps: Amount to increase current by in mA
             :type stepMilliamps: int
             :param stepTime: Time to wait before each increase, in Seconds
-            :type stepTime: int
+            :type stepTime: float
             :raises TenmaException: If the channel or current is invalid
         """
         self.checkChannel(channel)

@@ -22,7 +22,7 @@ def tenma_psu():
         psu = instantiate_tenma_class_from_device_response(port, debug=True)
     else:
         if sys.platform.startswith('win'):
-            ports = [f'COM{i}' for i in range(1, 256)]
+            ports = ['COM%s' % i for i in range(1, 256)]
         elif sys.platform.startswith('linux') or sys.platform.startswith('cygwin'):
             # this excludes your current terminal "/dev/tty"
             ports = glob.glob('/dev/tty[A-Za-z]*')
@@ -85,8 +85,8 @@ def test_psu_memory(tenma_psu):
         tenma_psu.saveConfFlow(slot, 1)
         # recall memory and assert voltages
         tenma_psu.recallConf(slot)
-        assert tenma_psu.readVoltage(1) == slot * tenma_psu.MAX_MV / 5 / 1000
-        assert tenma_psu.readCurrent(1) == slot * tenma_psu.MAX_MA / 5 / 1000
+        assert tenma_psu.readVoltage(1) == slot * tenma_psu.MAX_MV / 5.0 / 1000.0
+        assert tenma_psu.readCurrent(1) == slot * tenma_psu.MAX_MA / 5.0 / 1000.0
     # test invalid channels
     with pytest.raises(TenmaException):
         tenma_psu.saveConfFlow(1, -1)
