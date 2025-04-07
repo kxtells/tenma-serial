@@ -3,6 +3,14 @@ All notable changes for tenma-serial are listed in this file.
  
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+
+## [1.1.2] - 2025-04-07
+ 
+### Added
+
+- [TSER-10](https://github.com/kxtells/tenma-serial/pull/19)
+  Added support for unit Tenma 72-2710  
+
 ## [1.1.2] - 2024-02-12
  
 ### Added
