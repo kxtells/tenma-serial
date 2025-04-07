@@ -26,6 +26,7 @@
      * 72_2540 -> Tested on HW
      * 72_2550 -> Tested on HW
      * 72-2705 -> Tested on HW
+     * 72-2710 -> Tested on HW
      * 72_2930 -> Set as manufacturer manual (not tested)
      * 72_2940 -> Set as manufacturer manual (not tested)
      * 72_13320 -> Set as manufacturer manual (not tested)
@@ -821,6 +822,19 @@ class Tenma72_2705(Tenma72Base):
     MAX_MV = 31000
 
 
+class Tenma72_2710(Tenma72Base):
+    #:
+    MATCH_STR = ["72-2710"]
+    #:
+    NCHANNELS = 1
+    #:
+    NCONFS = 1
+    #:
+    MAX_MA = 5000
+    #:
+    MAX_MV = 30000
+    
+    
 class Tenma72_2940(Tenma72Base):
     #:
     MATCH_STR = ["72-2940"]
