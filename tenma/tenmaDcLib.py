@@ -54,22 +54,7 @@ def instantiate_tenma_class_from_device_response(device, debug=False):
         The subclasses mainly deal with the limit checks for each
         unit.
     """
-    # First instantiate base to retrieve version
-    powerSupply = Tenma72Base(device, debug=debug)
-    ver = powerSupply.getVersion()
-    if not ver:
-        if debug:
-            print("No version found, retrying with newline EOL")
-        ver = powerSupply.getVersion(serialEol="\n")
-    powerSupply.close()
-
-    for cls in findSubclassesRecursively(Tenma72Base):
-        for matchString in cls.MATCH_STR:
-            if matchString in ver:
-                return cls(device, debug=debug)
-
-    print("Could not detect Tenma power supply model, assuming 72_2545")
-    return Tenma72_2545(device, debug=debug)
+    return TenmaPowerSupply(device, debug=debug)
 
 
 def findSubclassesRecursively(cls):
@@ -165,6 +150,208 @@ class TenmaSerialHandler(object):
         """
         self.ser.close()
 
+
+class TenmaPowerSupply(object):
+    """Detect the Tenma power supply and call the corresponding implementation."""
+
+    def __init__(self, serialPort, debug=False):
+        self.__tenma = TenmaPowerSupply.__get_tenma_impl_from_response(serialPort, debug)
+
+    def __get_tenma_impl_from_response(device, debug=False):
+        """Get Tenma Object from power supply device."""
+        # First instantiate base to retrieve version
+        powerSupply = Tenma72Base(device, debug=debug)
+        ver = powerSupply.getVersion()
+        if not ver:
+            if debug:
+                print("No version found, retrying with newline EOL")
+            ver = powerSupply.getVersion(serialEol="\n")
+        powerSupply.close()
+
+        base_classes = findSubclassesRecursively(Tenma72Base) + findSubclassesRecursively(Tenma72_13360_base)
+        for cls in base_classes:
+            for matchString in cls.MATCH_STR:
+                if matchString in ver:
+                    return cls(device, debug=debug)
+
+        print("Could not detect Tenma power supply model, assuming 72_2545")
+        return Tenma72_2545(device, debug=debug)
+
+    def close(self):
+        self.__tenma.close()
+
+    def checkChannel(self, channel):
+        """Call checkChannel of the detected Tenma power supply."""
+        if isinstance(self.__tenma, Tenma72_13360_base):
+            self.__tenma.checkChannel()
+        else:
+            self.__tenma.checkChannel(channel)
+
+    def checkConf(self, conf):
+        """Call checkConf of the detected Tenma power supply."""
+        self.__tenma.conf()
+
+    def getVersion(self, serialEol=""):
+        """Call getVersion of the detected Tenma power supply."""
+        return self.__tenma.getVersion(serialEol)
+
+    def getStatus(self):
+        """Call getStatus of the detected Tenma power supply."""
+        return self.__tenma.getStatus()
+
+    def readCurrent(self, channel):
+        """Call readCurrent of the detected Tenma power supply."""
+        if isinstance(self.__tenma, Tenma72_13360_base):
+            return self.__tenma.readCurrent()
+        else:
+            return self.__tenma.readCurrent(channel)
+
+    def setCurrent(self, channel, mA):
+        """Call setCurrent of the detected Tenma power supply."""
+        if isinstance(self.__tenma, Tenma72_13360_base):
+            return self.__tenma.setCurrent(mA)
+        else:
+            return self.__tenma.setCurrent(channel, mA)
+
+    def readVoltage(self, channel):
+        """Call readVoltage of the detected Tenma power supply."""
+        if isinstance(self.__tenma, Tenma72_13360_base):
+            return self.__tenma.readVoltage()
+        else:
+            return self.__tenma.readVoltage(channel)
+
+    def setVoltage(self, channel, mV):
+        """Call setVoltage of the detected Tenma power supply."""
+        if isinstance(self.__tenma, Tenma72_13360_base):
+            return self.__tenma.setVoltage(mV)
+        else:
+            return self.__tenma.setVoltage(channel, mV)
+
+    def runningCurrent(self, channel):
+        """Call runningCurrent of the detected Tenma power supply."""
+        if isinstance(self.__tenma, Tenma72_13360_base):
+            return self.__tenma.runningCurrent()
+        else:
+            return self.__tenma.runningCurrent(channel)
+
+    def runningVoltage(self, channel):
+        """Call runningVoltage of the detected Tenma power supply."""
+        if isinstance(self.__tenma, Tenma72_13360_base):
+            return self.__tenma.runningVoltage()
+        else:
+            return self.__tenma.runningVoltage(channel)
+
+    def saveConf(self, conf):
+        """Call saveConf of the detected Tenma power supply."""
+        self.__tenma.saveConf(conf)
+
+    def saveConfFlow(self, conf, channel):
+        """Call saveConfFlow of the detected Tenma power supply."""
+        self.__tenma.saveConfFlow(conf)
+
+    def recallConf(self, conf):
+        """Call recallConf of the detected Tenma power supply."""
+        self.__tenma.recallConf(conf)
+
+    def setOCP(self, enable=True):
+        """Call setOCP of the detected Tenma power supply."""
+        self.__tenma.setOCP(enable)
+
+    def setOVP(self, enable=True):
+        """Call setOVP of the detected Tenma power supply."""
+        self.__tenma.setOVP(enable)
+
+    def setBEEP(self, enable=True):
+        """Call setBEEP of the detected Tenma power supply."""
+        self.__tenma.setBEEP(enable)
+
+    def ON(self):
+        """Call ON of the detected Tenma power supply."""
+        self.__tenma.ON()
+
+    def OFF(self):
+        """Call OFF of the detected Tenma power supply."""
+        self.__tenma.OFF()
+
+    def setLock(self, enable=True):
+        """Call setLock of the detected Tenma power supply."""
+        self.__tenma.setLock(enable)
+
+    def setTracking(self, trackingMode):
+        """Call setTracking of the detected Tenma power supply."""
+        self.__tenma.setTracking(trackingMode)
+
+    def startAutoVoltageStep(self, channel, startMillivolts,
+                                stopMillivolts, stepMillivolts, stepTime):
+        """Call startAutoVoltageStep of the detected Tenma power supply."""
+        if isinstance(self.__tenma, Tenma72_13360_base):
+            self.__tenma.startAutoVoltageStep(startMillivolts, stopMillivolts, stepMillivolts, stepTime)
+        else:
+            self.__tenma.startAutoVoltageStep(channel, startMillivolts, stopMillivolts, stepMillivolts, stepTime)
+
+    def stopAutoVoltageStep(self, channel):
+        """Call stopAutoVoltageStep of the detected Tenma power supply."""
+        if isinstance(self.__tenma, Tenma72_13360_base):
+            self.__tenma.stopAutoVoltageStep()
+        else:
+            self.__tenma.stopAutoVoltageStep(channel)
+
+    def startAutoCurrentStep(self, channel, startMilliamps,
+                                stopMilliamps, stepMilliamps, stepTime):
+        """Call startAutoCurrentStep of the detected Tenma power supply."""
+        if isinstance(self.__tenma, Tenma72_13360_base):
+            self.__tenma.startAutoCurrentStep(startMilliamps, stopMilliamps, stepMilliamps, stepTime)
+        else:
+            self.__tenma.startAutoCurrentStep(channel, startMilliamps, stopMilliamps, stepMilliamps, stepTime)
+
+    def stopAutoCurrentStep(self, channel):
+        """Call stopAutoCurrentStep of the detected Tenma power supply."""
+        if isinstance(self.__tenma, Tenma72_13360_base):
+            self.__tenma.stopAutoCurrentStep()
+        else:
+            self.__tenma.stopAutoCurrentStep(channel)
+
+    def setManualVoltageStep(self, channel, stepMillivolts):
+        """Call setManualVoltageStep of the detected Tenma power supply."""
+        if isinstance(self.__tenma, Tenma72_13360_base):
+            self.__tenma.setManualVoltageStep(stepMillivolts)
+        else:
+            self.__tenma.setManualVoltageStep(channel, stepMillivolts)
+
+    def stepVoltageUp(self, channel):
+        """Call stepVoltageUp of the detected Tenma power supply."""
+        if isinstance(self.__tenma, Tenma72_13360_base):
+            self.__tenma.stepVoltageUp()
+        else:
+            self.__tenma.stepVoltageUp(channel)
+
+    def stepVoltageDown(self, channel):
+        """Call stepVoltageDown of the detected Tenma power supply."""
+        if isinstance(self.__tenma, Tenma72_13360_base):
+            self.__tenma.stepVoltageDown()
+        else:
+            self.__tenma.stepVoltageDown(channel)
+
+    def setManualCurrentStep(self, channel, stepMilliamps):
+        """Call setManualCurrentStep of the detected Tenma power supply."""
+        if isinstance(self.__tenma, Tenma72_13360_base):
+            self.__tenma.setManualCurrentStep(stepMilliamps)
+        else:
+            self.__tenma.setManualCurrentStep(channel, stepMilliamps)
+
+    def stepCurrentUp(self, channel):
+        """Call stepCurrentUp of the detected Tenma power supply."""
+        if isinstance(self.__tenma, Tenma72_13360_base):
+            self.__tenma.stepCurrentUp()
+        else:
+            self.__tenma.stepCurrentUp(channel)
+
+    def stepCurrentDown(self, channel):
+        """Call stepCurrentDown of the detected Tenma power supply."""
+        if isinstance(self.__tenma, Tenma72_13360_base):
+            self.__tenma.stepCurrentDown()
+        else:
+            self.__tenma.stepCurrentDown(channel)
 
 class Tenma72Base(object):
     """
