@@ -22,7 +22,7 @@
     Supported models:
 
      * 72_2545 -> Tested on HW
-     * 72_2535 -> Set as manufacturer manual (not tested)
+     * 72_2535 -> Tested on HW (BEEP control not supported)
      * 72_2540 -> Tested on HW
      * 72_2550 -> Tested on HW
      * 72-2705 -> Tested on HW
