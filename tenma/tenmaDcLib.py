@@ -46,6 +46,44 @@ class TenmaException(Exception):
     pass
 
 
+class SingleChannelAdapter:
+    """
+    Adapter to make single-channel devices compatible with multi-channel
+    interface. This wrapper allows single-channel devices like Tenma72_13360 to
+    be used with code that expects multi-channel device signatures.
+
+    TODO: For 2.x versions, we should simply strive for the same interface in
+    all Tenma power supplies.
+    """
+    def __init__(self, single_channel_device):
+        self.device = single_channel_device
+
+    def setCurrent(self, channel, mA):
+        return self.device.setCurrent(mA)
+
+    def setVoltage(self, channel, mV):
+        return self.device.setVoltage(mV)
+
+    def readCurrent(self, channel=None):
+        return self.device.readCurrent()
+
+    def readVoltage(self, channel=None):
+        return self.device.readVoltage()
+
+    def runningCurrent(self, channel=None):
+        return self.device.runningCurrent()
+
+    def runningVoltage(self, channel=None):
+        return self.device.runningVoltage()
+
+    def saveConfFlow(self, conf, channel=None):
+        return self.device.saveConfFlow(conf)
+
+    # Delegate all other methods to the wrapped device
+    def __getattr__(self, name):
+        return getattr(self.device, name)
+
+
 def instantiate_tenma_class_from_device_response(device, debug=False):
     """
         Get a proper Tenma subclass depending on the version
@@ -53,6 +91,9 @@ def instantiate_tenma_class_from_device_response(device, debug=False):
 
         The subclasses mainly deal with the limit checks for each
         unit.
+
+        For single-channel devices, returns a SingleChannelAdapter to provide
+        compatibility with multi-channel interface expected by tenmaControl.
     """
     # First instantiate base to retrieve version
     powerSupply = Tenma72Base(device, debug=debug)
@@ -66,7 +107,11 @@ def instantiate_tenma_class_from_device_response(device, debug=False):
     for cls in findSubclassesRecursively(Tenma72Base):
         for matchString in cls.MATCH_STR:
             if matchString in ver:
-                return cls(device, debug=debug)
+                instance = cls(device, debug=debug)
+                # Check if this is a single-channel device that needs adaptation
+                if isinstance(instance, Tenma72_13360_base):
+                    return SingleChannelAdapter(instance)
+                return instance
 
     print("Could not detect Tenma power supply model, assuming 72_2545")
     return Tenma72_2545(device, debug=debug)
@@ -833,8 +878,8 @@ class Tenma72_2710(Tenma72Base):
     MAX_MA = 5000
     #:
     MAX_MV = 30000
-    
-    
+
+
 class Tenma72_2940(Tenma72Base):
     #:
     MATCH_STR = ["72-2940"]
