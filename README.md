@@ -95,7 +95,10 @@ For example: 2.2 Amperes 5V:
 
 # tenma-applet gtkIndicator
 
-A very simple GTK indicator to control a tenma DC power supply from a graphical desktop. Provides ON, OFF and RESET facilities. Simply start it with:
+A very simple GTK indicator to control a tenma DC power supply from a GTK based desktop (GNOME or similar).
+Provides ON, OFF and RESET facilities. Simply start it with:
+
+WARN: This applet is barely maintained and has not been tested in newer GNOME versions.
 
     tenma-applet
 
