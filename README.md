@@ -19,7 +19,7 @@ Supports the following models with predefined limits:
     * 72-2550 -> Tested on HW (@kxtells)
     * 72-2705 -> Tested on HW (@ollie1400)
     * 72-2710 -> Tested on HW (r202401, renier.daudey)
-    * 72-2930 -> Set as manufacturer manual (not tested)
+    * 72-2930 -> Tested on HW (@Thomas-Vreys)
     * 72-2940 -> Set as manufacturer manual (not tested)
     * 72-13320 -> Set as manufacturer manual (not tested)
     * 72-13330 -> Tested on HW (thomas-phillips-nz)

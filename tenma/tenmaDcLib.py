@@ -27,7 +27,7 @@
      * 72_2550 -> Tested on HW
      * 72-2705 -> Tested on HW
      * 72-2710 -> Tested on HW
-     * 72_2930 -> Set as manufacturer manual (not tested)
+     * 72_2930 -> Tested on HW
      * 72_2940 -> Set as manufacturer manual (not tested)
      * 72_13320 -> Set as manufacturer manual (not tested)
      * 72_13330 -> Tested on HW
